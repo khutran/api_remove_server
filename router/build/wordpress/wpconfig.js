@@ -1,0 +1,59 @@
+import express from "express";
+import WordpressQuery from '../../../scripts/WordpressQuery';
+import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
+import { Exception } from '../../../app/Exceptions/Exception';
+import * as _ from "lodash";
+
+let router = express.Router();
+
+router.get('/', asyncMiddleware(get));
+router.post("/", asyncMiddleware(create));
+router.put("/", asyncMiddleware(edit));
+
+async function get(req, res) {
+  try {
+    let website = req.query.website;
+    let query = new WordpressQuery();
+    query.moveDir(website);
+    let config = await query.readConfig('wp-config.php');
+
+    res.json({data: config});
+  } catch (e) {
+    throw new Exception(e.message, 1000);
+  }
+}
+
+async function create(req, res) {
+    try {
+        let website = req.body.website;
+        if (!website) {
+            throw new Error('website not empty');
+        }
+
+        let query = new WordpressQuery();
+        let result = await query.createWpConfig(website);
+        res.json({ data: result });
+    } catch (e) {
+        throw new Exception(e.message, 1000);
+    }
+
+}
+
+async function edit(req, res) {
+    try {
+        let website = req.body.website;
+        let config = req.body.config;
+        if (!website) {
+            throw new Error('website not empty');
+        }
+
+        let query = new WordpressQuery();
+        let result = await query.editWpConfig(website, config);
+        res.json({ data: result });
+    } catch (e) {
+        throw new Exception(e.message, 1000);
+    }
+
+}
+
+module.exports = router;
