@@ -5,7 +5,8 @@ require('dotenv').config()
 const spawn = require('child-process-promise').spawn;
 var exec = require('child-process-promise').exec;
 var Git = require("nodegit");
-
+import  Error from '../app/Exceptions/GetError';
+import { Exception } from '../app/Exceptions/Exception';
 import randomstring from "randomstring";
 
 export class Query {
@@ -76,7 +77,7 @@ export class Query {
                 }
                 data = _.split(data, '\n');
                 data = _.remove(data, (n) => {
-                    return !_.isEmpty(n) && n.indexOf('#') && n.indexOf('\r');
+                    return !_.isEmpty(n) && n.indexOf('#') && n.indexOf('\r') && n.indexOf('^M');
                 });
                 for (let i in data) {
                     data[i] = _.split(data[i], '=');
@@ -285,14 +286,14 @@ export class Query {
       return new Promise(async (resolve, reject) => {
         try {
           if (fs.existsSync(`${process.env.PATH_WEB}/${name}/workspace`)) {
-            resolve({path: `${process.env.PATH_WEB}/${name}/workspace`, success: true});
+            throw new Error('website exits', 208)
           } else {
             let cmd = this.convertCommand(`mkdir -p ${process.env.PATH_WEB}/${name}/workspace`);
             await spawn(cmd['cmd'], cmd['options'], { capture: ['stdout', 'stderr'] });
             resolve({ path: `${process.env.PATH_WEB}/${name}/workspace`, success: true});
           }
         } catch (e) {
-            reject({ path: '',success: false });
+            reject(e);
         }
       });
     }
@@ -323,7 +324,7 @@ export class Query {
           await this.checkout(repo, branch);
           resolve({ data: { success: true } });
         } catch (e) {
-          reject(e.message);
+          reject(e);
         }
       });
     }
@@ -356,7 +357,7 @@ export class Query {
           await this.checkout(repo, branch);
           resolve({data: { success: true}});
         } catch (e) {
-          reject(e.message);
+          reject(e);
         }
       });
     }
@@ -368,7 +369,7 @@ export class Query {
           await spawn(cmd['cmd'], cmd['options']);
           resolve({ success: true });
         } catch (e) {
-          reject(e.message);
+          reject(e);
         }
       });
     }

@@ -1,16 +1,15 @@
 import express from "express";
 import ApiComposer from "./composer";
-import ApiWpConfig from "./wpconfig";
+import Apiconfig from "./config";
 import ApiDatabase from "./database";
 import ApiProject from "./project";
 import ApiBuild from "./build";
-// import ApiEnv from "./env";
-// import ApiTest from "./test";
+
 
 let router = express.Router();
 
 router.use("/composer", ApiComposer);
-router.use("/wpconfig", ApiWpConfig);
+router.use("/config", Apiconfig);
 router.use("/database", ApiDatabase);
 router.use("/project", ApiProject);
 router.use("/build", ApiBuild);

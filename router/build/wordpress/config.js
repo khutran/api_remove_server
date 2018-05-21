@@ -2,25 +2,22 @@ import express from "express";
 import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
-import Error from "../../../app/Exceptions/GetError";
 import * as _ from "lodash";
 
 let router = express.Router();
 
-router.post("/clone", asyncMiddleware(clone));
-router.post("/pull", asyncMiddleware(pull));
-router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+router.post("/", asyncMiddleware(create));
+router.put("/", asyncMiddleware(edit));
 
-async function clone(req, res) {
+async function get(req, res) {
   try {
-    let domain = req.body.domain;
-    let git = req.body.git;
-    let branch = req.body.branch;
-    let key = req.body.key;
-    let secret = req.body.secret;
+    let website = req.query.website;
     let query = new WordpressQuery();
-    let result = await query.clone(domain, git, branch, key, secret);
-    res.json({ data: result });
+    query.moveDir(website);
+    let config = await query.readConfig("wp-config.php");
+
+    res.json({ data: config });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -30,38 +27,35 @@ async function clone(req, res) {
   }
 }
 
-async function pull(req, res) {
-  try {
-    let domain = req.body.domain;
-    let git = req.body.git;
-    let branch = req.body.branch;
-    let key = req.body.key;
-    let secret = req.body.secret;
-
-    let query = new WordpressQuery();
-    let result = await query.pull(domain, git, branch, key, secret);
-    res.json({ data: result });
-  } catch (e) {
-    if (e.error_code) {
-      throw new Exception(e.message, e.error_code);
-    } else {
-      throw new Exception(e.message, 500);
-    }
-  }
-}
-
-async function deleteP(req, res) {
+async function create(req, res) {
   try {
     let website = req.body.website;
-    let status = req.body.status;
-
-    if (status !== "stop") {
-      throw new Error("permisson define", 403);
+    if (!website) {
+      throw new Error("website not empty");
     }
 
     let query = new WordpressQuery();
-    let result = await query.deleteP(website);
+    let result = await query.createWpConfig(website);
+    res.json({ data: result });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
+async function edit(req, res) {
+  try {
+    let website = req.body.website;
+    let config = req.body.config;
+    if (!website) {
+      throw new Error("website not empty");
+    }
+
+    let query = new WordpressQuery();
+    let result = await query.editWpConfig(website, config);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
