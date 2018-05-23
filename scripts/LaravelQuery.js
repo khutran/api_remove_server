@@ -2,7 +2,7 @@ const spawn = require("child-process-promise").spawn;
 import fs from "fs";
 import { Query } from "./Query";
 import * as _ from "lodash";
-const spawncmd = require('child_process').spawn;
+const spawncmd = require("child_process").spawn;
 
 export default class LaravelQuery extends Query {
   runTest(website) {
@@ -112,6 +112,14 @@ export default class LaravelQuery extends Query {
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
+        if (e.message === "ENOENT: no such file or directory, uv_chdir") {
+          e.message = "website not build";
+          e.error_code = 204;
+        } else if (
+          e.message === "ENOENT: no such file or directory, open '.env'") {
+          e.message = "website not config";
+          e.error_code = 104;
+        }
         reject(e);
       }
     });
@@ -134,19 +142,26 @@ export default class LaravelQuery extends Query {
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
       this.moveDir(website);
-      let config = await this.readEnv('.env');
-      var sp = spawncmd('mysqldump', [
-        '-u' + config['DB_USERNAME'],
-        '-p' + config['DB_PASSWORD'],
-        '-h' + config['DB_HOST'],
-        config['DB_DATABASE'],
-        '--default-character-set=utf8',
-        '--comments'
-      ], {
+      let config = await this.readEnv(".env");
+      var sp = spawncmd(
+        "mysqldump",
+        [
+          "-u" + config["DB_USERNAME"],
+          "-p" + config["DB_PASSWORD"],
+          "-h" + config["DB_HOST"],
+          config["DB_DATABASE"],
+          "--default-character-set=utf8",
+          "--comments"
+        ],
+        {
           highWaterMark: 16 * 1024
-      });
-      res.setHeader('Content-Type', 'application/octet-stream');
-      res.setHeader('Content-disposition', `filename=${config['DB_DATABASE']}.sql`);
+        }
+      );
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.setHeader(
+        "Content-disposition",
+        `filename=${config["DB_DATABASE"]}.sql`
+      );
       sp.stdout.pipe(res);
     });
   }

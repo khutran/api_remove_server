@@ -43,7 +43,6 @@ async function create(req, res) {
     if (!website) {
       throw new Error("website not empty");
     }
-
     let query = new WordpressQuery();
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
@@ -111,7 +110,7 @@ async function buildFirts(req, res) {
     // file = _.remove(file, function (n) {
     //     return n.indexOf('database');
     // });
-    let file = ["./database/leannewvicoderscom_db.sql"];
+    let file = ["./database/leanvicoderscom_db.sql"];
 
     let importdb = await query.importDatabase(
       config["DB_USER"],
@@ -133,6 +132,12 @@ async function buildFirts(req, res) {
 async function deleteDb(req, res) {
   try {
     let website = req.body.website;
+    let status = req.body.status;
+
+    if (status !== "stop") {
+      throw new Error("permisson define", 403);
+    }
+
     let query = new WordpressQuery();
     query.moveDir(website);
     let config = await query.readConfig("wp-config.php");

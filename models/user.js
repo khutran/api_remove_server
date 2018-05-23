@@ -63,11 +63,11 @@ module.exports = (sequelize, DataTypes) => {
         });
 
         User.addHook('afterCreate', 'createuser', async(user, options) => {
-            await sequelize.query(`GRANT USAGE ON *.* TO '${user['User']}'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0`);
+            await sequelize.query(`GRANT USAGE ON *.* TO '${user['User']}'@'${process.env['MYSQL_HOST_USER']}' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0`);
             await sequelize.query(`FLUSH PRIVILEGES`);
             await sequelize.query(`CREATE DATABASE ${user['User']}_db`);
             await sequelize.query(`GRANT ALL PRIVILEGES ON \`${user['User']}_db\`.* TO '${user['User']}'@'${user['Host']}'`);
-            await sequelize.query(`GRANT ALL PRIVILEGES ON \`${user['User']}_db\`.* TO '${process.env['MYSQL_BACKUP']}'@'localhost'`);
+            await sequelize.query(`GRANT ALL PRIVILEGES ON \`${user['User']}_db\`.* TO '${process.env['MYSQL_BACKUP']}'@'${process.env['MYSQL_HOST_USER']}'`);
             return user;
         });
 

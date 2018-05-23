@@ -13,10 +13,11 @@ router.put("/", asyncMiddleware(edit));
 async function get(req, res) {
   try {
     let website = req.query.website;
+    if (!website) {
+      throw new Error("Website not empty");
+    }
     let query = new WordpressQuery();
-    query.moveDir(website);
-    let config = await query.readConfig("wp-config.php");
-
+    let config = await query.getConfig(website);
     res.json({ data: config });
   } catch (e) {
     if (e.error_code) {

@@ -5,9 +5,28 @@ import fs from "fs";
 import models from "../models";
 var exec = require("child-process-promise").exec;
 import { Exception } from "../app/Exceptions/Exception";
-const spawncmd = require('child_process').spawn;
+const spawncmd = require("child_process").spawn;
 
 export default class WordpressQuery extends Query {
+  getConfig(website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.moveDir(website);
+        let config = await this.readConfig("wp-config.php");
+        resolve(config);
+      } catch (e) {
+        if (e.message === "ENOENT: no such file or directory, uv_chdir") {
+          e.message = "website not build";
+          e.error_code = 204;
+        } else if (e.message === "ENOENT: no such file or directory, open 'wp-config.php'"){
+          e.message = "website not config";
+          e.error_code = 104;
+        }
+        reject(e);
+      }
+    });
+  }
+
   runComposerWordpress(command) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -25,7 +44,11 @@ export default class WordpressQuery extends Query {
   createWpConfig(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand(`cp ${__dirname}/../assets/demo/wp-config-sample.php ${process.env.PATH_WEB}/${website}/workspace/wp-config.php`);
+        let cmd = this.convertCommand(
+          `cp ${__dirname}/../assets/demo/wp-config-sample.php ${
+            process.env.PATH_WEB
+          }/${website}/workspace/wp-config.php`
+        );
         await spawn(cmd["cmd"], cmd["options"]);
         this.moveDir(website);
         let file = await this.readConfig("wp-config.php");
@@ -146,31 +169,44 @@ export default class WordpressQuery extends Query {
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
       this.moveDir(website);
-      let config = await this.readConfig('wp-config.php');
-      var sp = spawncmd('mysqldump', [
-        '-u' + config['DB_USER'],
-        '-p' + config['DB_PASSWORD'],
-        '-h' + config['DB_HOST'],
-        config['DB_NAME'],
-        '--default-character-set=utf8',
-        '--comments'
-      ], {
+      let config = await this.readConfig("wp-config.php");
+      var sp = spawncmd(
+        "mysqldump",
+        [
+          "-u" + config["DB_USER"],
+          "-p" + config["DB_PASSWORD"],
+          "-h" + config["DB_HOST"],
+          config["DB_NAME"],
+          "--default-character-set=utf8",
+          "--comments"
+        ],
+        {
           highWaterMark: 16 * 1024
-      });
-      res.setHeader('Content-Type', 'application/octet-stream');
-      res.setHeader('Content-disposition', `filename=${config['DB_NAME']}.sql`);
+        }
+      );
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.setHeader("Content-disposition", `filename=${config["DB_NAME"]}.sql`);
       sp.stdout.pipe(res);
     });
   }
 
-  importNewDb(website){
+  importNewDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
         this.moveDir(website);
-        let config = await this.readConfig('wp-config.php');
-        await this.backupDatabase(config['DB_USER'], config['DB_PASSWORD'], config['DB_NAME']);
-        await this.resetDatabase(config['DB_NAME']);
-        await this.importDatabase(config['DB_USER'], config['DB_PASSWORD'], config['DB_NAME'], 'leannewvicoderscom_db.sql');
+        let config = await this.readConfig("wp-config.php");
+        await this.backupDatabase(
+          config["DB_USER"],
+          config["DB_PASSWORD"],
+          config["DB_NAME"]
+        );
+        await this.resetDatabase(config["DB_NAME"]);
+        await this.importDatabase(
+          config["DB_USER"],
+          config["DB_PASSWORD"],
+          config["DB_NAME"],
+          "leannewvicoderscom_db.sql"
+        );
 
         let webold = await models.sequelize.query(
           `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
@@ -181,17 +217,17 @@ export default class WordpressQuery extends Query {
         webold = webold[0].option_value;
 
         await this.replaceUrl(
-          config['DB_NAME'],
-          config['PREFIX'],
+          config["DB_NAME"],
+          config["PREFIX"],
           webold,
           website
         );
-        resolve({message: true});
-      } catch (e){
+        resolve({ message: true });
+      } catch (e) {
         console.log(e);
-        if(!e.message){
+        if (!e.message) {
           reject(e);
-        }else{
+        } else {
           reject(e.message);
         }
       }

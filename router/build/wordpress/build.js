@@ -22,6 +22,7 @@ async function clone(req, res) {
     let result = await query.clone(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {
+    console.log(e);
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
     } else {
