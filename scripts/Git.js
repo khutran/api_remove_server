@@ -15,15 +15,15 @@ export default class Git extends Query {
         await this.creatFolder(domain);
         let cmdClone = this.convertCommand(`git clone ${urlGit} ./`);
         let cmd1 = this.convertCommand(
-          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+          `git fetch --tags --progress ${urlGit} +refs/heads/*:refs/remotes/origin/*`
         );
-        let cmd2 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd2 = this.convertCommand(`git config remote.origin.url ${urlGit}`);
         let cmd3 = this.convertCommand(
           `git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*`
         );
-        let cmd4 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd4 = this.convertCommand(`git config remote.origin.url ${urlGit}`);
         let cmd5 = this.convertCommand(
-          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+          `git fetch --tags --progress ${urlGit} +refs/heads/*:refs/remotes/origin/*`
         );
         let cmd6 = this.convertCommand(
           `git rev-parse refs/remotes/origin/${branch}^{commit}`
