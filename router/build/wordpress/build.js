@@ -4,10 +4,12 @@ import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import Error from "../../../app/Exceptions/GetError";
 import * as _ from "lodash";
+import Git from "../../../scripts/Git";
 
 let router = express.Router();
 
 router.post("/clone", asyncMiddleware(clone));
+router.post("/push", asyncMiddleware(push));
 router.post("/pull", asyncMiddleware(pull));
 router.delete("/", asyncMiddleware(deleteP));
 
@@ -18,11 +20,29 @@ async function clone(req, res) {
     let branch = req.body.branch;
     let key = req.body.key;
     let secret = req.body.secret;
-    let query = new WordpressQuery();
+    let query = new Git();
     let result = await query.clone(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {
-    console.log(e);
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
+
+async function push(req, res) {
+  try {
+    let domain = req.body.domain;
+    let git = req.body.git;
+    let branch = req.body.branch;
+    let key = req.body.key;
+    let secret = req.body.secret;
+    let query = new Git();
+    let result = await query.push(domain, git, branch, key, secret);
+    res.json({ data: result });
+  } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
     } else {
@@ -39,7 +59,7 @@ async function pull(req, res) {
     let key = req.body.key;
     let secret = req.body.secret;
 
-    let query = new WordpressQuery();
+    let query = new Git();
     let result = await query.pull(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {

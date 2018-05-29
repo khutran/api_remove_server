@@ -1,0 +1,165 @@
+const spawn = require("child-process-promise").spawn;
+import { Query } from "./Query";
+import * as _ from "lodash";
+import fs from "fs";
+var exec = require("child-process-promise").exec;
+import { Exception } from "../app/Exceptions/Exception";
+const spawncmd = require("child_process").spawn;
+
+export default class Git extends Query {
+  clone(domain, git, branch, key, secret) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let url = git.split("@");
+        let urlGit = `https://${key}:${secret}@${url[1]}`;
+        await this.creatFolder(domain);
+        let cmdClone = this.convertCommand(`git clone ${urlGit} ./`);
+        let cmd1 = this.convertCommand(
+          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+        );
+        let cmd2 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd3 = this.convertCommand(
+          `git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*`
+        );
+        let cmd4 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd5 = this.convertCommand(
+          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+        );
+        let cmd6 = this.convertCommand(
+          `git rev-parse refs/remotes/origin/${branch}^{commit}`
+        );
+        let cmd7 = this.convertCommand(
+          `git rev-parse refs/remotes/origin/origin/${branch}^{commit}`
+        );
+        // let cmd8 = this.convertCommand(`git config core.sparsecheckout`);
+
+        this.moveDir(domain);
+
+        await spawn(cmdClone["cmd"], cmdClone["options"]);
+
+        await spawn(cmd1["cmd"], cmd1["options"]);
+        await spawn(cmd2["cmd"], cmd2["options"]);
+        await spawn(cmd3["cmd"], cmd3["options"]);
+        await spawn(cmd4["cmd"], cmd4["options"]);
+        await spawn(cmd5["cmd"], cmd5["options"]);
+
+        let code = await spawn(cmd6["cmd"], cmd6["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        code.stdout = code.stdout.replace("\n", "");
+        let cmd9 = this.convertCommand(`git checkout -f ${code.stdout}`);
+        // let a = await spawn(cmd8["cmd"], cmd8["options"], {
+        //   capture: ["stdout", "stderr"]
+        // });
+        // console.log(a.stderr);
+        // await spawn(cmd8["cmd"], cmd8["options"]);
+        await spawn(cmd9["cmd"], cmd9["options"]);
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  push(domain, git, branch, key, secret) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.moveDir(domain);
+
+        if (!(await this.checkBranch(branch))) {
+          this.createBranch(branch);
+        } else {
+          await this.checkoutBranch(branch);
+        }
+
+        let cmd1 = this.convertCommand(`git add .`);
+        let cmd2 = this.convertCommand(`git commit -m ${branch}`);
+        let cmd3 = this.convertCommand(`git push origin ${branch}`);
+
+        await spawn(cmd1["cmd"], cmd1["options"]);
+        await spawn(cmd2["cmd"], cmd2["options"]);
+        await spawn(cmd3["cmd"], cmd3["options"]);
+
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  pull(domain, git, branch, key, secret) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.moveDir(domain);
+
+        if (!(await this.checkBranch("backup"))) {
+          this.createBranch("backup");
+        }
+
+        let cmd1 = this.convertCommand(`git rev-parse --is-inside-work-tree`);
+        let cmd2 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd3 = this.convertCommand(
+          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+        );
+        let cmd4 = this.convertCommand(
+          `git rev-parse refs/remotes/origin/${branch}^{commit}`
+        );
+
+        await spawn(cmd1["cmd"], cmd1["options"]);
+        await spawn(cmd2["cmd"], cmd2["options"]);
+        await spawn(cmd3["cmd"], cmd3["options"]);
+
+        let code = await spawn(cmd4["cmd"], cmd4["options"], {
+          capture: ["stdout", "stderr"]
+        });
+
+        code.stdout = code.stdout.replace("\n", "");
+        let cmd5 = this.convertCommand(`git checkout -f ${code.stdout}`);
+        await spawn(cmd5["cmd"], cmd5["options"]);
+
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  checkoutBranch(branch) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`git checkout ${branch}`);
+        await spawn(cmd["cmd"], cmd["options"]);
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  checkBranch(branch) {
+    return new Promise(async (resolve, reject) => {
+      let cmd = this.convertCommand("git branch");
+      let sp = await spawn(cmd["cmd"], cmd["options"], {
+        capture: ["stdout", "stderr"]
+      });
+
+      if (sp.stdout.indexOf(branch) > -1) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  createBranch(branch) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`git checkout -b ${branch}`);
+        await spawn(cmd["cmd"], cmd["options"]);
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+}

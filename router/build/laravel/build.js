@@ -1,5 +1,6 @@
 import express from "express";
 import LaravelQuery from "../../../scripts/LaravelQuery";
+import Git from "../../../scripts/Git";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import Error from "../../../app/Exceptions/GetError";
@@ -18,9 +19,9 @@ async function clone(req, res) {
     let branch = req.body.branch;
     let key = req.body.key;
     let secret = req.body.secret;
-    let query = new LaravelQuery();
+    let query = new Git();
     let result = await query.clone(domain, git, branch, key, secret);
-    res.json({ data: result });
+    res.json({ data: 'result' });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -38,7 +39,7 @@ async function pull(req, res) {
     let key = req.body.key;
     let secret = req.body.secret;
 
-    let query = new LaravelQuery();
+    let query = new Git();
     let result = await query.pull(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {

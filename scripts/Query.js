@@ -7,6 +7,7 @@ var exec = require("child-process-promise").exec;
 import Error from "../app/Exceptions/GetError";
 import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
+import { Domain } from "domain";
 
 export class Query {
   moveDir(website = null, link = "") {
@@ -348,12 +349,13 @@ export class Query {
     });
   }
 
-  clone(domain, git, branch, key, secret) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        git = git.split("@");
-        let urlGit = `https://${key}:${secret}@${git[1]}`;
-
+  // clone(domain, url, branch, key, secret) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       let git = new Git();
+  //       url = url.split("@");
+  //       let urlGit = `https://${key}:${secret}@${url[1]}`;
+  //       let clone = await git.Clone(Domain, urlGit, branch);
       //  let path = await this.creatFolder(domain);
       //   this.moveDir(domain);
         // let cmd  = this.convertCommand(`git clone ${urlGit} ./`);
@@ -361,29 +363,30 @@ export class Query {
         // let repo = await Git.Clone(urlGit, "./");
         // await this.createLocalBranch(repo, branch);
         // await this.checkout(repo, branch);
-        resolve({ data: { success: true } });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
+  //       resolve({ data: { success: true } });
+  //     } catch (e) {
+  //       reject(e);
+  //     }
+  //   });
+  // }
 
-  async createLocalBranch(repo, branch) {
-    let reference = await repo.getBranch(`refs/remotes/origin/${branch}`);
-    await repo.checkoutRef(reference);
-    const commit = await repo.getHeadCommit();
-    await repo.createBranch(branch, commit, 1);
-    await repo.mergeBranches(branch, `remotes/origin/${branch}`);
-  }
+  // async createLocalBranch(repo, branch) {
+  //   let reference = await repo.getBranch(`refs/remotes/origin/${branch}`);
+  //   await repo.checkoutRef(reference);
+  //   const commit = await repo.getHeadCommit();
+  //   await repo.createBranch(branch, commit, 1);
+  //   await repo.mergeBranches(branch, `remotes/origin/${branch}`);
+  // }
 
-  async checkout(repo, branch) {
-    let reference = await repo.getBranch(branch);
-    await repo.checkoutRef(reference);
-  }
+  // async checkout(repo, branch) {
+  //   let reference = await repo.getBranch(branch);
+  //   await repo.checkoutRef(reference);
+  // }
 
-  pull(domain, git, branch, key, secret) {
-    return new Promise(async (resolve, reject) => {
-      try {
+  // pull(domain, url, branch, key, secret) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       let git = new Git();
         // let path = await this.getPath(domain);
         // let repo = await Git.Repository.open(path.path);
         // let remote = await repo.getRemote("origin");
@@ -394,12 +397,12 @@ export class Query {
         // });
         // await this.createLocalBranch(repo, branch);
         // await this.checkout(repo, branch);
-        resolve({ data: { success: true } });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
+  //       resolve({ data: { success: true } });
+  //     } catch (e) {
+  //       reject(e);
+  //     }
+  //   });
+  // }
 
   deleteP(website) {
     return new Promise(async (resolve, reject) => {
