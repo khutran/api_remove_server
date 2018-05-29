@@ -4,7 +4,6 @@ import models from "../models";
 require("dotenv").config();
 const spawn = require("child-process-promise").spawn;
 var exec = require("child-process-promise").exec;
-var Git = require("nodegit");
 import Error from "../app/Exceptions/GetError";
 import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
@@ -354,12 +353,14 @@ export class Query {
       try {
         git = git.split("@");
         let urlGit = `https://${key}:${secret}@${git[1]}`;
-        console.log(urlGit);
-        let path = await this.creatFolder(domain);
-        this.moveDir(domain);
-        let repo = await Git.Clone(urlGit, "./");
-        await this.createLocalBranch(repo, branch);
-        await this.checkout(repo, branch);
+
+      //  let path = await this.creatFolder(domain);
+      //   this.moveDir(domain);
+        // let cmd  = this.convertCommand(`git clone ${urlGit} ./`);
+        // await spawn(cmd["cmd"], cmd["options"]);
+        // let repo = await Git.Clone(urlGit, "./");
+        // await this.createLocalBranch(repo, branch);
+        // await this.checkout(repo, branch);
         resolve({ data: { success: true } });
       } catch (e) {
         reject(e);
@@ -383,16 +384,16 @@ export class Query {
   pull(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
-        let path = await this.getPath(domain);
-        let repo = await Git.Repository.open(path.path);
-        let remote = await repo.getRemote("origin");
-        await repo.fetch(remote, {
-          downloadTags: 1,
-          prune: 1,
-          updateFetchhead: 1
-        });
-        await this.createLocalBranch(repo, branch);
-        await this.checkout(repo, branch);
+        // let path = await this.getPath(domain);
+        // let repo = await Git.Repository.open(path.path);
+        // let remote = await repo.getRemote("origin");
+        // await repo.fetch(remote, {
+        //   downloadTags: 1,
+        //   prune: 1,
+        //   updateFetchhead: 1
+        // });
+        // await this.createLocalBranch(repo, branch);
+        // await this.checkout(repo, branch);
         resolve({ data: { success: true } });
       } catch (e) {
         reject(e);
