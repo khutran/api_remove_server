@@ -17,10 +17,11 @@ router.get("/", asyncMiddleware(get));
 async function get(req, res) {
   try {
     let website = req.query.website;
-    let query = new LaravelQuery();
+    let query = new WordpressQuery();
     query.moveDir(website);
     res.json({ success: true });
   } catch (e) {
+    console.log(e);
     throw new Exception('website not found', 500);
   }
 }
