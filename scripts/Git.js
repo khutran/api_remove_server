@@ -87,14 +87,26 @@ export default class Git extends Query {
     });
   }
 
-  pull(domain, git, branch, key, secret) {
+  backup(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
         this.moveDir(domain);
 
-        if (!(await this.checkBranch("backup"))) {
-          this.createBranch("backup");
+        if (!(await this.checkBranch(branch))) {
+          this.createBranch(branch);
+        } else {
+          await this.checkoutBranch(branch);
         }
+      } catch (e) {
+
+      }
+    });
+  }
+
+  pull(domain, git, branch, key, secret) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.moveDir(domain);
 
         let cmd1 = this.convertCommand(`git rev-parse --is-inside-work-tree`);
         let cmd2 = this.convertCommand(`git config remote.origin.url ${git}`);

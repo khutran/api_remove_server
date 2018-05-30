@@ -2,12 +2,13 @@ import express from "express";
 import LaravelQuery from "../../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
-router.post("/", asyncMiddleware(create));
-router.put("/", asyncMiddleware(edit));
-router.get("/", asyncMiddleware(get));
+router.post("/", AuthMiddleware, asyncMiddleware(create));
+router.put("/", AuthMiddleware, asyncMiddleware(edit));
+router.get("/", AuthMiddleware, asyncMiddleware(get));
 
 async function get(req, res) {
   try {

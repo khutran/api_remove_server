@@ -2,6 +2,7 @@ import express from "express";
 import LaravelQuery from "../../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 

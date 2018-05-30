@@ -3,12 +3,13 @@ import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
-router.get("/", asyncMiddleware(get));
-router.post("/", asyncMiddleware(create));
-router.put("/", asyncMiddleware(edit));
+router.get("/", AuthMiddleware, asyncMiddleware(get));
+router.post("/", AuthMiddleware, asyncMiddleware(create));
+router.put("/", AuthMiddleware, asyncMiddleware(edit));
 
 async function get(req, res) {
   try {

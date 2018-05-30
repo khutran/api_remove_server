@@ -8,6 +8,10 @@ import Error from "../app/Exceptions/GetError";
 import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
 import { Domain } from "domain";
+import archiver from "archiver";
+var archive = archiver("zip", {
+  zlib: { level: 9 } // Sets the compression level.
+});
 
 export class Query {
   moveDir(website = null, link = "") {
@@ -203,7 +207,7 @@ export class Query {
         let dbname = website.replace(/[\.|\-]/gi, "");
         let password = randomstring.generate(8);
         let data = {
-          Host: process.env['MYSQL_HOST_USER'],
+          Host: process.env["MYSQL_HOST_USER"],
           User: dbname,
           plugin: "mysql_native_password",
           authentication_string: password,
@@ -213,8 +217,8 @@ export class Query {
         let user = await models.user.create(data);
         resolve(data);
       } catch (e) {
-        if(e.message === 'Validation error') {
-          e.message = 'Db or user exits';
+        if (e.message === "Validation error") {
+          e.message = "Db or user exits";
         }
         reject(e);
       }
@@ -359,13 +363,13 @@ export class Query {
   //       url = url.split("@");
   //       let urlGit = `https://${key}:${secret}@${url[1]}`;
   //       let clone = await git.Clone(Domain, urlGit, branch);
-      //  let path = await this.creatFolder(domain);
-      //   this.moveDir(domain);
-        // let cmd  = this.convertCommand(`git clone ${urlGit} ./`);
-        // await spawn(cmd["cmd"], cmd["options"]);
-        // let repo = await Git.Clone(urlGit, "./");
-        // await this.createLocalBranch(repo, branch);
-        // await this.checkout(repo, branch);
+  //  let path = await this.creatFolder(domain);
+  //   this.moveDir(domain);
+  // let cmd  = this.convertCommand(`git clone ${urlGit} ./`);
+  // await spawn(cmd["cmd"], cmd["options"]);
+  // let repo = await Git.Clone(urlGit, "./");
+  // await this.createLocalBranch(repo, branch);
+  // await this.checkout(repo, branch);
   //       resolve({ data: { success: true } });
   //     } catch (e) {
   //       reject(e);
@@ -390,16 +394,16 @@ export class Query {
   //   return new Promise(async (resolve, reject) => {
   //     try {
   //       let git = new Git();
-        // let path = await this.getPath(domain);
-        // let repo = await Git.Repository.open(path.path);
-        // let remote = await repo.getRemote("origin");
-        // await repo.fetch(remote, {
-        //   downloadTags: 1,
-        //   prune: 1,
-        //   updateFetchhead: 1
-        // });
-        // await this.createLocalBranch(repo, branch);
-        // await this.checkout(repo, branch);
+  // let path = await this.getPath(domain);
+  // let repo = await Git.Repository.open(path.path);
+  // let remote = await repo.getRemote("origin");
+  // await repo.fetch(remote, {
+  //   downloadTags: 1,
+  //   prune: 1,
+  //   updateFetchhead: 1
+  // });
+  // await this.createLocalBranch(repo, branch);
+  // await this.checkout(repo, branch);
   //       resolve({ data: { success: true } });
   //     } catch (e) {
   //       reject(e);
@@ -419,6 +423,17 @@ export class Query {
         reject(e);
       }
     });
+  }
+
+  compressed(website, res) {
+    let path = `${process.env.PATH_WEB}/${website}`;
+
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-disposition", `filename=${website}.zip`);
+    archive.pipe(res);
+
+    archive.directory(path, website);
+    archive.finalize();
   }
 
   Log(website) {

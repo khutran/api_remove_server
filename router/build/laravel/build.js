@@ -5,13 +5,21 @@ import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import Error from "../../../app/Exceptions/GetError";
 import * as _ from "lodash";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
-router.post("/clone", asyncMiddleware(clone));
+router.post("/clone", AuthMiddleware , asyncMiddleware(clone));
 router.post("/pull", asyncMiddleware(pull));
-router.delete("/", asyncMiddleware(deleteP));
-router.get("/", asyncMiddleware(get));
+router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
+router.get("/", AuthMiddleware, asyncMiddleware(get));
+router.get("/download", AuthMiddleware, asyncMiddleware(download));
+
+async function download(req, res) {
+  let website = req.query.website;
+  let query = new LaravelQuery();
+  await query.compressed(website, res);
+}
 
 async function get(req, res) {
   try {

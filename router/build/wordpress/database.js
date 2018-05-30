@@ -3,15 +3,16 @@ import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
 router.get("/download", asyncMiddleware(download));
-router.post("/create", asyncMiddleware(create));
-router.post("/build", asyncMiddleware(build));
-router.post("/buildfirts", asyncMiddleware(buildFirts));
-router.post("/import", asyncMiddleware(importDb));
-router.delete("/", asyncMiddleware(deleteDb));
+router.post("/create", AuthMiddleware, asyncMiddleware(create));
+router.post("/build", AuthMiddleware, asyncMiddleware(build));
+router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
+router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
+router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
 
 async function download(req, res) {
   let website = req.query.website;

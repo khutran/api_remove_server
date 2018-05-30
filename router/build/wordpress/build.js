@@ -5,14 +5,22 @@ import { Exception } from "../../../app/Exceptions/Exception";
 import Error from "../../../app/Exceptions/GetError";
 import * as _ from "lodash";
 import Git from "../../../scripts/Git";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
-router.post("/clone", asyncMiddleware(clone));
-router.post("/push", asyncMiddleware(push));
+router.post("/clone", AuthMiddleware, asyncMiddleware(clone));
+router.post("/backup", AuthMiddleware, asyncMiddleware(backup));
 router.post("/pull", asyncMiddleware(pull));
-router.delete("/", asyncMiddleware(deleteP));
-router.get("/", asyncMiddleware(get));
+router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
+router.get("/", AuthMiddleware, asyncMiddleware(get));
+router.get("/download", asyncMiddleware(download));
+
+async function download(req, res) {
+  let website = req.query.website;
+  let query = new WordpressQuery();
+  await query.compressed(website, res);
+}
 
 async function get(req, res) {
   try {
@@ -44,7 +52,7 @@ async function clone(req, res) {
   }
 }
 
-async function push(req, res) {
+async function backup(req, res) {
   try {
     let domain = req.body.domain;
     let git = req.body.git;
@@ -52,7 +60,7 @@ async function push(req, res) {
     let key = req.body.key;
     let secret = req.body.secret;
     let query = new Git();
-    let result = await query.push(domain, git, branch, key, secret);
+    let result = await query.backup(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

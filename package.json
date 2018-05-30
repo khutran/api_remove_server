@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "MULTI_THREAD=true ENV=production node ./dist/app.js",
     "devstart": "nodemon ./node_modules/.bin/babel-node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,error_code.md,README.md,app.test.js --copy-files"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +15,7 @@
     "build": "./index.js"
   },
   "dependencies": {
+    "archiver": "^2.1.1",
     "axios": "^0.18.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -23,10 +26,12 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.2.1",
     "mysql2": "^1.5.3",
     "q": "^1.5.0",
     "randomstring": "^1.1.5",
     "requestify": "^0.2.5",
+    "rimraf": "^2.6.2",
     "sequelize": "^4.37.4",
     "sequelize-cli": "^4.0.0"
   },

@@ -3,16 +3,17 @@ import LaravelQuery from "../../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
+import AuthMiddleware from '../../../midlewares/AuthMiddleware';
 
 let router = express.Router();
 
-router.post("/build", asyncMiddleware(build));
-router.post("/create", asyncMiddleware(create));
-router.post("/reset", asyncMiddleware(reset));
-router.post("/seed", asyncMiddleware(seed));
-router.post("/buildfirts", asyncMiddleware(buildFirts));
-router.delete("/", asyncMiddleware(deleteDb));
-router.post("/import", asyncMiddleware(importDb));
+router.post("/build", AuthMiddleware, asyncMiddleware(build));
+router.post("/create", AuthMiddleware, asyncMiddleware(create));
+router.post("/reset", AuthMiddleware, asyncMiddleware(reset));
+router.post("/seed", AuthMiddleware, asyncMiddleware(seed));
+router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
+router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
+router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
 router.get("/download", asyncMiddleware(download));
 
 async function download(req, res) {
