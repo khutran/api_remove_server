@@ -11,6 +11,18 @@ let router = express.Router();
 router.post("/clone", asyncMiddleware(clone));
 router.post("/pull", asyncMiddleware(pull));
 router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+
+async function get(req, res) {
+  try {
+    let website = req.query.website;
+    let query = new LaravelQuery();
+    query.moveDir(website);
+    res.json({ success: true });
+  } catch (e) {
+    throw new Exception('website not found', 500);
+  }
+}
 
 async function clone(req, res) {
   try {
@@ -21,7 +33,7 @@ async function clone(req, res) {
     let secret = req.body.secret;
     let query = new Git();
     let result = await query.clone(domain, git, branch, key, secret);
-    res.json({ data: 'result' });
+    res.json({ data: "result" });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
