@@ -213,6 +213,9 @@ export class Query {
         let user = await models.user.create(data);
         resolve(data);
       } catch (e) {
+        if(e.message === 'Validation error') {
+          e.message = 'Db or user exits';
+        }
         reject(e);
       }
     });

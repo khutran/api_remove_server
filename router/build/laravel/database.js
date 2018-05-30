@@ -51,7 +51,7 @@ async function importDb(req, res) {
 
 async function deleteDb(req, res) {
   try {
-    let website = req.body.website;
+    let website = req.query.website;
     let query = new LaravelQuery();
     query.moveDir(website);
     let config = await query.readEnv(".env");

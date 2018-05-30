@@ -65,8 +65,8 @@ async function pull(req, res) {
 
 async function deleteP(req, res) {
   try {
-    let website = req.body.website;
-    let status = req.body.status;
+    let website = req.query.website;
+    let status = req.query.status;
 
     if (status !== "stop") {
       throw new Error("permisson define", 403);

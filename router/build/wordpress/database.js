@@ -130,9 +130,9 @@ async function buildFirts(req, res) {
 
 async function deleteDb(req, res) {
   try {
-    let website = req.body.website;
-    let status = req.body.status;
-
+    let website = req.query.website;
+    let status = req.query.status;
+    console.log(status);
     if (status !== "stop") {
       throw new Error("permisson define", 403);
     }
