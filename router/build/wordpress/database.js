@@ -106,11 +106,10 @@ async function buildFirts(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let config = await query.readConfig("wp-config.php");
-    // let file = await query.findFile('*.sql');
-    // file = _.remove(file, function (n) {
-    //     return n.indexOf('database');
-    // });
-    let file = ["./database/leanvicoderscom_db.sql"];
+    let file = await query.findFile('*.sql');
+    file = _.remove(file, function (n) {
+        return n.indexOf('database');
+    });
 
     let importdb = await query.importDatabase(
       config["DB_USER"],
