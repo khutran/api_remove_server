@@ -21,7 +21,6 @@ async function get(req, res) {
     query.moveDir(website);
     res.json({ success: true });
   } catch (e) {
-    console.log(e);
     throw new Exception('website not found', 500);
   }
 }
