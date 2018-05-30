@@ -12,6 +12,18 @@ router.post("/clone", asyncMiddleware(clone));
 router.post("/push", asyncMiddleware(push));
 router.post("/pull", asyncMiddleware(pull));
 router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+
+async function get(req, res) {
+  try {
+    let website = req.query.website;
+    let query = new LaravelQuery();
+    query.moveDir(website);
+    res.json({ success: true });
+  } catch (e) {
+    throw new Exception('website not found', 500);
+  }
+}
 
 async function clone(req, res) {
   try {
