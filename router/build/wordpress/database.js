@@ -13,6 +13,24 @@ router.post("/build", AuthMiddleware, asyncMiddleware(build));
 router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
 router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
+router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
+
+async function replace(req, res) {
+  try {
+    let website = req.body.website;
+    let query = new WordpressQuery();
+    query.moveDir(website);
+    let db = await query.readConfig("wp-config.php");
+    let urlsite = await query.getSiteurl(db['DB_NAME'], db['PREFIX']);
+    res.json(urlsite);
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function download(req, res) {
   let website = req.query.website;
@@ -112,13 +130,14 @@ async function buildFirts(req, res) {
         return n.indexOf('database');
     });
 
-    let importdb = await query.importDatabase(
+    await query.importDatabase(
       config["DB_USER"],
       config["DB_PASSWORD"],
       config["DB_NAME"],
       file[file.length - 1].slice(11)
     );
 
+    await query.
     res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {

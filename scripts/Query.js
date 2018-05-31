@@ -296,10 +296,27 @@ export class Query {
     });
   }
 
-  replaceUrl(dbname, frefix, urlold, urlnew) {
-    urlnew = "http://" + urlnew;
+  getSiteurl (db, frefix) {
     return new Promise(async (resolve, reject) => {
       try {
+        let siteurl  = await models.sequelize.query(`SELECT * FROM ${db}.${frefix}options WHERE option_name = 'siteurl'`, { type: models.sequelize.QueryTypes.SELECT });
+        resolve(siteurl[0].option_value);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  replaceUrl(dbname, frefix, urlold, urlnew, https=false) {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        if(https === false) {
+          urlnew = "http://" + urlnew;
+        } else {
+          urlnew = "https://" + urlnew;
+        }
+           
         await models.sequelize.query(
           `UPDATE ${dbname}.${frefix}options SET option_value = replace(option_value, '${urlold}', '${urlnew}') WHERE option_name = 'home' OR option_name = 'siteurl'`
         );
