@@ -20,13 +20,13 @@ async function runComposer(req, res) {
     let path;
     let query = new WordpressQuery();
     query.moveDir(website);
-    // let file = await query.findFile('composer.json');
-    // _.forEach(file, (item) => {
-    //     if (item.indexOf('themes') > -1) {
-    //         path = item.slice(1, -13);
-    //     }
-    // });
-    path = "/wp-content/themes/lean";
+    let file = await query.findFile('composer.json');
+    _.forEach(file, (item) => {
+        if (item.indexOf('themes') > -1) {
+            path = item.slice(1, -13);
+        }
+    });
+    // path = "/wp-content/themes/lean";
     query.moveDir(website, path);
     await query.runComposerWordpress("rm -rf composer.lock");
     let result = await query.runComposerWordpress("composer install");

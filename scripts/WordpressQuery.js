@@ -224,7 +224,6 @@ export default class WordpressQuery extends Query {
         );
         resolve({ message: true });
       } catch (e) {
-        console.log(e);
         if (!e.message) {
           reject(e);
         } else {

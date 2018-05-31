@@ -205,10 +205,16 @@ export class Query {
     return new Promise(async (resolve, reject) => {
       try {
         let dbname = website.replace(/[\.|\-]/gi, "");
+        dbname = dbname.replace('vicoderscom', '');
+        
+        if (dbname.length >= 10) {
+          dbname = dbname.slice(0, 10);
+        }
+
         let password = randomstring.generate(8);
         let data = {
           Host: process.env["MYSQL_HOST_USER"],
-          User: dbname,
+          User: `${dbname}_user`,
           plugin: "mysql_native_password",
           authentication_string: password,
           password_last_changed: new Date()
