@@ -3,7 +3,7 @@ import LaravelQuery from "../../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
@@ -15,6 +15,20 @@ router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
 router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
 router.get("/download", asyncMiddleware(download));
+router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
+
+async function replace(req, res) {
+  try {
+    let website = req.body.website;
+    res.json({ data: { suscess: true } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function download(req, res) {
   try {

@@ -3,7 +3,7 @@ import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
@@ -18,11 +18,22 @@ router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
 async function replace(req, res) {
   try {
     let website = req.body.website;
+    let https = false;
     let query = new WordpressQuery();
     query.moveDir(website);
     let db = await query.readConfig("wp-config.php");
-    let urlsite = await query.getSiteurl(db['DB_NAME'], db['PREFIX']);
-    res.json(urlsite);
+    let urlold = await query.getSiteurl(db["DB_NAME"], db["PREFIX"]);
+    if (urlold.indexOf("https") >-1) {
+      https = true;
+    }
+    await query.replaceUrl(
+      db["DB_NAME"],
+      db["PREFIX"],
+      urlold,
+      website,
+      https
+    );
+    res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -125,11 +136,10 @@ async function buildFirts(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let config = await query.readConfig("wp-config.php");
-    let file = await query.findFile('*.sql');
-    file = _.remove(file, function (n) {
-        return n.indexOf('database');
+    let file = await query.findFile("*.sql");
+    file = _.remove(file, function(n) {
+      return n.indexOf("database");
     });
-
     await query.importDatabase(
       config["DB_USER"],
       config["DB_PASSWORD"],
@@ -137,8 +147,7 @@ async function buildFirts(req, res) {
       file[file.length - 1].slice(11)
     );
 
-    await query.
-    res.json({ data: { suscess: true } });
+    await query.res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
