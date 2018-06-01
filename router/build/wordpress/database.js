@@ -113,6 +113,7 @@ async function build(req, res) {
       config["DB_USER"],
       config["DB_PASSWORD"],
       config["DB_NAME"],
+      config["DB_HOST"],
       file[file.length - 1].slice(11)
     );
 
@@ -145,6 +146,7 @@ async function buildFirts(req, res) {
       config["DB_USER"],
       config["DB_PASSWORD"],
       config["DB_NAME"],
+      config["DB_HOST"],
       file[file.length - 1].slice(11)
     );
 

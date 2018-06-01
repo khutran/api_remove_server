@@ -112,6 +112,7 @@ export default class WordpressQuery extends Query {
         let db = await this.exportDatabase(
           config["DB_USER"],
           config["DB_PASSWORD"],
+          config["DB_HOST"],
           config["DB_NAME"]
         );
 

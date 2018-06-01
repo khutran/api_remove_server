@@ -231,11 +231,11 @@ export class Query {
     });
   }
 
-  exportDatabase(user, password, dbname) {
+  exportDatabase(user, password, host, dbname) {
     return new Promise(async (resolve, reject) => {
       try {
         let ex = await exec(
-          `mysqldump -u ${user} -p${password} ${dbname} > database/${dbname}.sql`
+          `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > database/${dbname}.sql`
         );
 
         resolve({ success: true, database: `${dbname}.sql` });
@@ -245,11 +245,11 @@ export class Query {
     });
   }
 
-  backupDatabase(user, password, dbname) {
+  backupDatabase(user, password, host, dbname) {
     return new Promise(async (resolve, reject) => {
       try {
         let ex = await exec(
-          `mysqldump -u ${user} -p${password} ${dbname} > /var/www/backupdatabase/${dbname}.sql`
+          `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > /var/www/backupdatabase/${dbname}.sql`
         );
 
         resolve({ success: true, database: `${dbname}.sql` });
@@ -283,11 +283,11 @@ export class Query {
     });
   }
 
-  importDatabase(user, password, dbname, impotdb) {
+  importDatabase(user, password, dbname, host, impotdb) {
     return new Promise(async (resolve, reject) => {
       try {
         await exec(
-          `mysql -u ${user} -p${password} ${dbname} < database/${impotdb}`
+          `mysql -u ${user} -p${password} ${dbname} -h ${host} < database/${impotdb}`
         );
         resolve({ success: true });
       } catch (e) {
