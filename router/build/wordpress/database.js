@@ -140,6 +140,7 @@ async function buildFirts(req, res) {
     file = _.remove(file, function(n) {
       return n.indexOf("database");
     });
+
     await query.importDatabase(
       config["DB_USER"],
       config["DB_PASSWORD"],
@@ -147,7 +148,7 @@ async function buildFirts(req, res) {
       file[file.length - 1].slice(11)
     );
 
-    await query.res.json({ data: { suscess: true } });
+    res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -161,7 +162,6 @@ async function deleteDb(req, res) {
   try {
     let website = req.query.website;
     let status = req.query.status;
-    console.log(status);
     if (status !== "stop") {
       throw new Error("permisson define", 403);
     }
