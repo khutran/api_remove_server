@@ -15,6 +15,40 @@ router.post("/pull", asyncMiddleware(pull));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
 router.get("/", AuthMiddleware, asyncMiddleware(get));
 router.get("/download", asyncMiddleware(download));
+router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
+
+async function buildFirts(req, res) {
+  try {
+    let website = req.body.website;
+    if (!website) {
+      throw new Error("website not empty");
+    }
+
+    let query = new WordpressQuery();
+    query.moveDir(website);
+    let config = await query.readConfig("wp-config.php");
+    let file = await query.findFile("*.sql");
+    file = _.remove(file, function(n) {
+      return n.indexOf("database");
+    });
+
+    await query.importDatabase(
+      config["DB_USER"],
+      config["DB_PASSWORD"],
+      config["DB_NAME"],
+      config["DB_HOST"],
+      file[file.length - 1].slice(11)
+    );
+
+    res.json({ data: { suscess: true } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function download(req, res) {
   let website = req.query.website;

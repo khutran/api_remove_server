@@ -1,5 +1,5 @@
 import express from "express";
-import LaravelQuery from "../../../scripts/LaravelQuery";
+import NodejsQuery from "../../../scripts/NodejsQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
@@ -32,7 +32,7 @@ async function replace(req, res) {
 async function download(req, res) {
   try {
     let website = req.query.website;
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     await query.dump(res, website);
   } catch (e) {
     if (e.error_code) {
@@ -50,7 +50,7 @@ async function importDb(req, res) {
       throw new Error("website not empty");
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     query.moveDir(website);
     await query.runMigrate(website);
     res.json({ data: { success: true } });
@@ -66,7 +66,7 @@ async function importDb(req, res) {
 async function deleteDb(req, res) {
   try {
     let website = req.query.website;
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     query.moveDir(website);
     let config = await query.readEnv(".env");
     let q = await query.deleteDatabase(
@@ -83,6 +83,8 @@ async function deleteDb(req, res) {
   }
 }
 
+
+
 async function create(req, res) {
   try {
     let website = req.body.website;
@@ -90,7 +92,7 @@ async function create(req, res) {
       throw new Error("website not empty");
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
     result["Password"] = result["authentication_string"];
@@ -111,7 +113,7 @@ async function build(req, res) {
     if (!website) {
       throw new Error("Website not empty");
     }
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     await query.runMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {
@@ -130,7 +132,7 @@ async function reset(req, res) {
       throw new Error("Website not empty");
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     await query.resetMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {
@@ -149,7 +151,7 @@ async function seed(req, res) {
       throw new Error("Website not empty");
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     await query.seedMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {

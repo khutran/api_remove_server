@@ -10,7 +10,13 @@ export default class Git extends Query {
   clone(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
-        let url = git.split("@");
+        let url ;
+        if(git.indexOf('github.com') > -1 ) {
+          url = git.split("//");
+        } else {
+          url = git.split("@");
+        }
+        
         let urlGit = `https://${key}:${secret}@${url[1]}`;
         await this.creatFolder(domain);
         let cmdClone = this.convertCommand(`git clone ${urlGit} ./`);

@@ -10,7 +10,6 @@ let router = express.Router();
 router.get("/download", asyncMiddleware(download));
 router.post("/create", AuthMiddleware, asyncMiddleware(create));
 router.post("/build", AuthMiddleware, asyncMiddleware(build));
-router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
 router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
 router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
@@ -110,39 +109,6 @@ async function build(req, res) {
     });
 
     let importdb = await query.importDatabase(
-      config["DB_USER"],
-      config["DB_PASSWORD"],
-      config["DB_NAME"],
-      config["DB_HOST"],
-      file[file.length - 1].slice(11)
-    );
-
-    res.json({ data: { suscess: true } });
-  } catch (e) {
-    if (e.error_code) {
-      throw new Exception(e.message, e.error_code);
-    } else {
-      throw new Exception(e.message, 500);
-    }
-  }
-}
-
-async function buildFirts(req, res) {
-  try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("website not empty");
-    }
-
-    let query = new WordpressQuery();
-    query.moveDir(website);
-    let config = await query.readConfig("wp-config.php");
-    let file = await query.findFile("*.sql");
-    file = _.remove(file, function(n) {
-      return n.indexOf("database");
-    });
-
-    await query.importDatabase(
       config["DB_USER"],
       config["DB_PASSWORD"],
       config["DB_NAME"],

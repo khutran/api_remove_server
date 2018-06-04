@@ -1,5 +1,5 @@
 import express from "express";
-import LaravelQuery from "../../../scripts/LaravelQuery";
+import NodejsQuery from "../../../scripts/NodejsQuery";
 import Git from "../../../scripts/Git";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
@@ -23,10 +23,11 @@ async function buildFirts(req, res) {
       throw new Error("website not empty");
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     query.moveDir(website);
-    await query.runMigrate(website);
-    await query.seedMigrate(website);
+    await query.npmInstall(website);
+    await query.createDb(website);
+    await query.seedDb(website);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -39,14 +40,14 @@ async function buildFirts(req, res) {
 
 async function download(req, res) {
   let website = req.query.website;
-  let query = new LaravelQuery();
+  let query = new NodejsQuery();
   await query.compressed(website, res);
 }
 
 async function get(req, res) {
   try {
     let website = req.query.website;
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     query.moveDir(website);
     res.json({ success: true });
   } catch (e) {
@@ -102,7 +103,7 @@ async function deleteP(req, res) {
       throw new Error("permisson define", 403);
     }
 
-    let query = new LaravelQuery();
+    let query = new NodejsQuery();
     let result = await query.deleteP(website);
 
     res.json({ data: result });
