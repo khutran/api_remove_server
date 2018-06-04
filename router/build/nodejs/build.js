@@ -25,7 +25,7 @@ async function buildFirts(req, res) {
 
     let query = new NodejsQuery();
     query.moveDir(website);
-    await query.npmInstall(website);
+    // await query.npmInstall(website);
     await query.createDb(website);
     await query.seedDb(website);
     res.json({ data: { success: true } });
