@@ -114,10 +114,19 @@ export default class Git extends Query {
       try {
         this.moveDir(domain);
 
+        let url ;
+        if(git.indexOf('github.com') > -1 ) {
+          url = git.split("//");
+        } else {
+          url = git.split("@");
+        }
+        
+        let urlGit = `https://${key}:${secret}@${url[1]}`;
+
         let cmd1 = this.convertCommand(`git rev-parse --is-inside-work-tree`);
-        let cmd2 = this.convertCommand(`git config remote.origin.url ${git}`);
+        let cmd2 = this.convertCommand(`git config remote.origin.url ${urlGit}`);
         let cmd3 = this.convertCommand(
-          `git fetch --tags --progress ${git} +refs/heads/*:refs/remotes/origin/*`
+          `git fetch --tags --progress ${urlGit} +refs/heads/*:refs/remotes/origin/*`
         );
         let cmd4 = this.convertCommand(
           `git rev-parse refs/remotes/origin/${branch}^{commit}`
