@@ -16,10 +16,8 @@ async function runComposer(req, res) {
     }
 
     let query = new NodejsQuery();
-    // await query.runComposerLaravel(website, "rm -rf composer.lock");
-    let result = await query.runComposerLaravel(website, "yarn install");
-    // await query.runComposerLaravel(website, "composer dump-autoload -o");
-    // await query.runComposerLaravel(website, "chown -R jenkins:userweb vendor");
+    let result = await query.runYarn(website, "yarn install");
+
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

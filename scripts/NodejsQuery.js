@@ -23,21 +23,7 @@ export default class NodejsQuery extends Query {
   createDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("./node_modules/.bin/sequelize db:migrates");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  resetDb(website) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let cmd = this.convertCommand("./node_modules/.bin/sequelize db:migrates");
+        let cmd = this.convertCommand("./node_modules/.bin/sequelize db:migrate");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
         });
@@ -121,20 +107,7 @@ export default class NodejsQuery extends Query {
       }
     });
   }
-  runComposerLaravel(website, command) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.moveDir(website);
-        let cmd = this.convertCommand(command);
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
+
 
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
@@ -160,6 +133,21 @@ export default class NodejsQuery extends Query {
         `filename=${config["DB_DATABASE"]}.sql`
       );
       sp.stdout.pipe(res);
+    });
+  }
+
+  runYarn(website, command) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.moveDir(website);
+        let cmd = this.convertCommand(command);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 }
