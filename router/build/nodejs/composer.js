@@ -16,7 +16,7 @@ async function runComposer(req, res) {
     }
 
     let query = new NodejsQuery();
-    let result = await query.runYarn(website, "npm install");
+    let result = await query.runYarn(website, "yarn install");
 
     res.json({ data: result });
   } catch (e) {
