@@ -18,12 +18,8 @@ async function get(req, res) {
         return file.indexOf(".") !== 0 && file.slice(-5) === ".json";
       })
       .forEach(file => {
-        console.log(fs.readFileSync(`${process.env.PATH_WEB}/ecosystem/${file}`));
-        // arr.push(
-        //   JSON.parse(
-        //     fs.readFileSync(`${process.env.PATH_WEB}/ecosystem/${file}`)
-        //   )
-        // );
+        let obj = JSON.parse(fs.readFileSync(`${process.env.PATH_WEB}/ecosystem/${file}`));
+        arr.push(obj.apps[0]);
       });
 
     res.json({ data: arr });
