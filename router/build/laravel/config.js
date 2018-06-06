@@ -17,6 +17,7 @@ async function get(req, res) {
       throw new Error("Website not empty");
     }
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.getEnv(website);
     res.json({ data: result });
   } catch (e) {
@@ -35,6 +36,7 @@ async function create(req, res) {
       throw new Error("Website not empty");
     }
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.createEnv(website);
     res.json({ data: result });
   } catch (e) {
@@ -51,6 +53,7 @@ async function edit(req, res) {
     let website = req.body.website;
     let config = req.body.config;
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.editEnv(website, config);
     res.json({ data: result });
   } catch (e) {

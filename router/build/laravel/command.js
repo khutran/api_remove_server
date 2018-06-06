@@ -17,6 +17,7 @@ async function runCommand(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.runCommand(website, command);
     res.json({ data: result });
   } catch (e) {

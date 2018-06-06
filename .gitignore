@@ -11,3 +11,4 @@ app/Configs/config.json
 app.test.js
 /dist
 /uploads
+yarn.lock

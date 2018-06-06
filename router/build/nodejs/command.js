@@ -2,7 +2,7 @@ import express from "express";
 import NodejsQuery from "../../../scripts/NodejsQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
@@ -17,6 +17,7 @@ async function runCommand(req, res) {
     }
 
     let query = new NodejsQuery();
+    query.moveDir(website);
     let result = await query.runCommand(website, command);
     res.json({ data: result });
   } catch (e) {

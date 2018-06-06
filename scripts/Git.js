@@ -18,7 +18,7 @@ export default class Git extends Query {
         }
         
         let urlGit = `https://${key}:${secret}@${url[1]}`;
-        await this.creatFolder(domain);
+        
         let cmdClone = this.convertCommand(`git clone ${urlGit} ./`);
         let cmd1 = this.convertCommand(
           `git fetch --tags --progress ${urlGit} +refs/heads/*:refs/remotes/origin/*`
@@ -70,8 +70,6 @@ export default class Git extends Query {
   push(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(domain);
-
         if (!(await this.checkBranch(branch))) {
           this.createBranch(branch);
         } else {
@@ -96,8 +94,6 @@ export default class Git extends Query {
   backup(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(domain);
-
         if (!(await this.checkBranch(branch))) {
           this.createBranch(branch);
         } else {
@@ -112,8 +108,6 @@ export default class Git extends Query {
   pull(domain, git, branch, key, secret) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(domain);
-
         let url ;
         if(git.indexOf('github.com') > -1 ) {
           url = git.split("//");

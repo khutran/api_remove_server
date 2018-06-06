@@ -45,6 +45,7 @@ async function replace(req, res) {
 async function download(req, res) {
   let website = req.query.website;
   let query = new WordpressQuery();
+  query.moveDir(website);
   await query.dump(res, website);
 }
 
@@ -53,6 +54,7 @@ async function importDb(req, res) {
     let website = req.body.website;
 
     let query = new WordpressQuery();
+    query.moveDir(website);
     let q = await query.importNewDb(website);
 
     res.json({ data: q });
@@ -73,6 +75,7 @@ async function create(req, res) {
       throw new Error("website not empty");
     }
     let query = new WordpressQuery();
+    query.moveDir(website);
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
     result["Password"] = result["authentication_string"];

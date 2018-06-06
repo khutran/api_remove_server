@@ -16,6 +16,7 @@ async function runComposer(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     await query.runComposerLaravel(website, "rm -rf composer.lock");
     let result = await query.runComposerLaravel(website, "composer install");
     await query.runComposerLaravel(website, "composer dump-autoload -o");

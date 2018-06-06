@@ -11,7 +11,6 @@ export default class WordpressQuery extends Query {
   getConfig(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
@@ -65,7 +64,6 @@ export default class WordpressQuery extends Query {
   editWpConfig(website, data) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let filewpconfig = await this.readFile("wp-config.php");
         let file = await this.readConfig("wp-config.php");
         filewpconfig = _.split(filewpconfig, "\n");
@@ -96,7 +94,6 @@ export default class WordpressQuery extends Query {
   renameProject(website, webnew, firts = "http://") {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let config;
         if (fs.existsSync("database") === false) {
           await spawn("mkdir", ["database"]);
@@ -169,7 +166,6 @@ export default class WordpressQuery extends Query {
 
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
-      this.moveDir(website);
       let config = await this.readConfig("wp-config.php");
       var sp = spawncmd(
         "mysqldump",
@@ -194,7 +190,6 @@ export default class WordpressQuery extends Query {
   importNewDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let config = await this.readConfig("wp-config.php");
         await this.backupDatabase(
           config["DB_USER"],

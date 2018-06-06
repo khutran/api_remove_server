@@ -19,6 +19,7 @@ async function get(req, res) {
       throw new Error("Website not empty");
     }
     let query = new WordpressQuery();
+    query.moveDir(website);
     let config = await query.getConfig(website);
     res.json({ data: config });
   } catch (e) {
@@ -38,6 +39,7 @@ async function create(req, res) {
     }
 
     let query = new WordpressQuery();
+    query.moveDir(website);
     let result = await query.createWpConfig(website);
     res.json({ data: result });
   } catch (e) {
@@ -58,6 +60,7 @@ async function edit(req, res) {
     }
 
     let query = new WordpressQuery();
+    query.moveDir(website);
     let result = await query.editWpConfig(website, config);
     res.json({ data: result });
   } catch (e) {

@@ -18,6 +18,7 @@ async function create(req, res) {
     }
 
     let query = new WordpressQuery();
+    query.moveDir(website);
     let result = await query.createProject(website, git);
     res.json({ data: result });
   } catch (e) {
@@ -39,6 +40,7 @@ async function rename(req, res) {
     }
 
     let query = new WordpressQuery();
+    query.moveDir(website);
     let result = await query.renameProject(webold, webnew);
     res.json({ data: result });
   } catch (e) {

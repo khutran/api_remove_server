@@ -13,7 +13,7 @@ router.post("/clone", AuthMiddleware , asyncMiddleware(clone));
 router.post("/pull", asyncMiddleware(pull));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
 router.get("/", AuthMiddleware, asyncMiddleware(get));
-router.get("/download", AuthMiddleware, asyncMiddleware(download));
+router.get("/download",  asyncMiddleware(download));
 router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
 
 async function buildFirts(req, res) {
@@ -40,6 +40,7 @@ async function buildFirts(req, res) {
 async function download(req, res) {
   let website = req.query.website;
   let query = new LaravelQuery();
+  query.moveDir(website);
   await query.compressed(website, res);
 }
 
@@ -62,6 +63,8 @@ async function clone(req, res) {
     let key = req.body.key;
     let secret = req.body.secret;
     let query = new Git();
+    await query.creatFolder(domain);
+    query.moveDir(domain);
     let result = await query.clone(domain, git, branch, key, secret);
     res.json({ data: "result" });
   } catch (e) {
@@ -82,6 +85,7 @@ async function pull(req, res) {
     let secret = req.body.secret;
 
     let query = new Git();
+    query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
     res.json({ data: result });
   } catch (e) {
@@ -103,6 +107,7 @@ async function deleteP(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.deleteP(website);
 
     res.json({ data: result });

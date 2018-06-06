@@ -5,15 +5,15 @@ import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import Error from "../../../app/Exceptions/GetError";
 import * as _ from "lodash";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
-router.post("/clone", AuthMiddleware , asyncMiddleware(clone));
+router.post("/clone", AuthMiddleware, asyncMiddleware(clone));
 router.post("/pull", asyncMiddleware(pull));
 router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
 router.get("/", AuthMiddleware, asyncMiddleware(get));
-router.get("/download", AuthMiddleware, asyncMiddleware(download));
+router.get("/download", asyncMiddleware(download));
 router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
 
 async function buildFirts(req, res) {
@@ -50,7 +50,7 @@ async function get(req, res) {
     query.moveDir(website);
     res.json({ success: true });
   } catch (e) {
-    throw new Exception('website not found', 500);
+    throw new Exception("website not found", 500);
   }
 }
 
@@ -62,6 +62,8 @@ async function clone(req, res) {
     let key = req.body.key;
     let secret = req.body.secret;
     let query = new Git();
+    await query.creatFolder(domain);
+    query.moveDir(domain);
     let result = await query.clone(domain, git, branch, key, secret);
     res.json({ data: "result" });
   } catch (e) {
@@ -82,8 +84,11 @@ async function pull(req, res) {
     let secret = req.body.secret;
 
     let query = new Git();
-    let result = await query.pull(domain, git, branch, key, secret);
-    res.json({ data: result });
+    query.moveDir(domain);
+
+    await query.pull(domain, git, branch, key, secret);
+    await query.runBuild(domain);
+    res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -103,6 +108,7 @@ async function deleteP(req, res) {
     }
 
     let query = new NodejsQuery();
+    query.moveDir(website);
     let result = await query.deleteP(website);
 
     res.json({ data: result });

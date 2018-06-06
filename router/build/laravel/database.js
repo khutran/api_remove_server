@@ -33,6 +33,7 @@ async function download(req, res) {
   try {
     let website = req.query.website;
     let query = new LaravelQuery();
+    query.moveDir(website);
     await query.dump(res, website);
   } catch (e) {
     if (e.error_code) {
@@ -91,6 +92,7 @@ async function create(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
     result["Password"] = result["authentication_string"];
@@ -112,6 +114,7 @@ async function build(req, res) {
       throw new Error("Website not empty");
     }
     let query = new LaravelQuery();
+    query.moveDir(website);
     await query.runMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {
@@ -131,6 +134,7 @@ async function reset(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     await query.resetMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {
@@ -150,6 +154,7 @@ async function seed(req, res) {
     }
 
     let query = new LaravelQuery();
+    query.moveDir(website);
     await query.seedMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {

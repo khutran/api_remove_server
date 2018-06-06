@@ -5,7 +5,6 @@ import * as _ from "lodash";
 const spawncmd = require("child_process").spawn;
 
 export default class NodejsQuery extends Query {
-
   npmInstall(website) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -23,7 +22,9 @@ export default class NodejsQuery extends Query {
   createDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("./node_modules/.bin/sequelize db:migrate");
+        let cmd = this.convertCommand(
+          "./node_modules/.bin/sequelize db:migrate"
+        );
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
         });
@@ -37,7 +38,9 @@ export default class NodejsQuery extends Query {
   seedDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("./node_modules/.bin/sequelize db:seed:all");
+        let cmd = this.convertCommand(
+          "./node_modules/.bin/sequelize db:seed:all"
+        );
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
         });
@@ -51,7 +54,6 @@ export default class NodejsQuery extends Query {
   createEnv(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
@@ -68,7 +70,6 @@ export default class NodejsQuery extends Query {
   editEnv(website, data) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let dataEnv = await this.readEnv(".env");
         _.mapKeys(data, (value, key) => {
           dataEnv[key] = `${data[key]}`;
@@ -91,7 +92,6 @@ export default class NodejsQuery extends Query {
   getEnv(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
@@ -99,7 +99,8 @@ export default class NodejsQuery extends Query {
           e.message = "website not build";
           e.error_code = 204;
         } else if (
-          e.message === "ENOENT: no such file or directory, open '.env'") {
+          e.message === "ENOENT: no such file or directory, open '.env'"
+        ) {
           e.message = "website not config";
           e.error_code = 104;
         }
@@ -108,18 +109,16 @@ export default class NodejsQuery extends Query {
     });
   }
 
-
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
-      this.moveDir(website);
       let config = await this.readEnv(".env");
       var sp = spawncmd(
         "mysqldump",
         [
-          "-u" + config["DB_USERNAME"],
-          "-p" + config["DB_PASSWORD"],
+          "-u" + config["DB_USER"],
+          "-p" + config["DB_PASS"],
           "-h" + config["DB_HOST"],
-          config["DB_DATABASE"],
+          config["DB_NAME"],
           "--default-character-set=utf8",
           "--comments"
         ],
@@ -128,10 +127,7 @@ export default class NodejsQuery extends Query {
         }
       );
       res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader(
-        "Content-disposition",
-        `filename=${config["DB_DATABASE"]}.sql`
-      );
+      res.setHeader("Content-disposition", `filename=${config["DB_NAME"]}.sql`);
       sp.stdout.pipe(res);
     });
   }
@@ -139,8 +135,21 @@ export default class NodejsQuery extends Query {
   runYarn(website, command) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand(command);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  runBuild(website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand("yarn build");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
         });

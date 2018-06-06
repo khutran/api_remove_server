@@ -8,7 +8,6 @@ export default class LaravelQuery extends Query {
   runTest(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("php artisan make:test UserTest --unit");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
@@ -23,7 +22,6 @@ export default class LaravelQuery extends Query {
   runMigrate(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("php artisan migrate");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
@@ -38,7 +36,6 @@ export default class LaravelQuery extends Query {
   resetMigrate(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("php artisan migrate:refresh");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
@@ -53,7 +50,6 @@ export default class LaravelQuery extends Query {
   seedMigrate(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("php artisan db:seed");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
@@ -68,7 +64,6 @@ export default class LaravelQuery extends Query {
   createEnv(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
@@ -85,7 +80,6 @@ export default class LaravelQuery extends Query {
   editEnv(website, data) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let dataEnv = await this.readEnv(".env");
         _.mapKeys(data, (value, key) => {
           dataEnv[key] = `${data[key]}`;
@@ -108,7 +102,6 @@ export default class LaravelQuery extends Query {
   getEnv(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
@@ -127,7 +120,6 @@ export default class LaravelQuery extends Query {
   runComposerLaravel(website, command) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = this.convertCommand(command);
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
@@ -141,7 +133,6 @@ export default class LaravelQuery extends Query {
 
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
-      this.moveDir(website);
       let config = await this.readEnv(".env");
       var sp = spawncmd(
         "mysqldump",

@@ -189,7 +189,6 @@ export class Query {
   runCommand(website, command) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.moveDir(website);
         let cmd = await this.filterCommand(command);
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
