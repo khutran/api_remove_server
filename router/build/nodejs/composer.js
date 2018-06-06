@@ -16,9 +16,8 @@ async function runComposer(req, res) {
     }
 
     let query = new NodejsQuery();
-    let q = await query.runYarn(website, "yarn install");
+    let q = await query.runYarn();
 
-    console.log(q);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

@@ -19,7 +19,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  createDb(website) {
+  createDb() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(
@@ -35,7 +35,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  seedDb(website) {
+  seedDb() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(
@@ -132,31 +132,4 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  runYarn(website, command) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let cmd = this.convertCommand(command);
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  runBuild(website) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let cmd = this.convertCommand("yarn build");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
 }
