@@ -3,14 +3,14 @@ import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.get("/",  asyncMiddleware(get));
-router.post("/",  asyncMiddleware(create));
-router.put("/",  asyncMiddleware(edit));
+router.all("*", AuthMiddleware);
+router.get("/", asyncMiddleware(get));
+router.post("/", asyncMiddleware(create));
+router.put("/", asyncMiddleware(edit));
 
 async function get(req, res) {
   try {
@@ -23,6 +23,14 @@ async function get(req, res) {
     let config = await query.getConfig(website);
     res.json({ data: config });
   } catch (e) {
+    if (e.message === "ENOENT: no such file or directory, uv_chdir") {
+      e.message = "website not build";
+      e.error_code = 204;
+    } else if (e.message === "ENOENT: no such file or directory, open '.env'") {
+      e.message = "website not config";
+      e.error_code = 104;
+    }
+    
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
     } else {

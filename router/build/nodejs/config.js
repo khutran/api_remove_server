@@ -22,6 +22,14 @@ async function get(req, res) {
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
+      if (e.message === "ENOENT: no such file or directory, uv_chdir") {
+        e.message = "website not build";
+        e.error_code = 204;
+      } else if (e.message === "ENOENT: no such file or directory, open '.env'") {
+        e.message = "website not config";
+        e.error_code = 104;
+      }
+      
       throw new Exception(e.message, e.error_code);
     } else {
       throw new Exception(e.message, 500);
