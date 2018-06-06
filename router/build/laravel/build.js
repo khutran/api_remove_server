@@ -25,8 +25,8 @@ async function buildFirts(req, res) {
 
     let query = new LaravelQuery();
     query.moveDir(website);
-    await query.runMigrate(website);
-    await query.seedMigrate(website);
+    await query.runMigrate();
+    await query.seedMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

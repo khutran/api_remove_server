@@ -8,7 +8,7 @@ import { Exception } from "../app/Exceptions/Exception";
 const spawncmd = require("child_process").spawn;
 
 export default class WordpressQuery extends Query {
-  getConfig(website) {
+  getConfig() {
     return new Promise(async (resolve, reject) => {
       try {
         let config = await this.readConfig("wp-config.php");
@@ -61,7 +61,7 @@ export default class WordpressQuery extends Query {
     });
   }
 
-  editWpConfig(website, data) {
+  editWpConfig(data) {
     return new Promise(async (resolve, reject) => {
       try {
         let filewpconfig = await this.readFile("wp-config.php");
@@ -164,7 +164,7 @@ export default class WordpressQuery extends Query {
     });
   }
 
-  dump(res, website) {
+  dump(res) {
     return new Promise(async (resolve, reject) => {
       let config = await this.readConfig("wp-config.php");
       var sp = spawncmd(

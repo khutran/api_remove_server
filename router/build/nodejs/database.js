@@ -18,7 +18,6 @@ router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
 
 async function replace(req, res) {
   try {
-    let website = req.body.website;
     res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
@@ -53,7 +52,7 @@ async function importDb(req, res) {
 
     let query = new NodejsQuery();
     query.moveDir(website);
-    await query.runMigrate(website);
+    await query.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -118,7 +117,7 @@ async function build(req, res) {
     }
     let query = new NodejsQuery();
     query.moveDir(website);
-    await query.runMigrate(website);
+    await query.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -157,7 +156,8 @@ async function seed(req, res) {
     }
 
     let query = new NodejsQuery();
-    await query.seedMigrate(website);
+    query.moveDir(website);
+    await query.seedMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

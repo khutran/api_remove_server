@@ -3,7 +3,7 @@ import WordpressQuery from "../../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import * as _ from "lodash";
-import AuthMiddleware from '../../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
@@ -20,17 +20,26 @@ async function runComposer(req, res) {
     let path;
     let query = new WordpressQuery();
     query.moveDir(website);
-    let file = await query.findFile('composer.json');
-    _.forEach(file, (item) => {
-        if (item.indexOf('themes') > -1) {
-            path = item.slice(1, -13);
-        }
+    let file = await query.findFile("composer.json");
+    _.forEach(file, item => {
+      if (item.indexOf("themes") > -1) {
+        path = item.slice(1, -13);
+      }
     });
-    // path = "/wp-content/themes/lean";
+
     query.moveDir(website, path);
-    await query.runComposerWordpress("rm -rf composer.lock");
-    let result = await query.runComposerWordpress("composer install");
-    await query.runComposerWordpress("composer dump-autoload -o");
+
+    let composer = await query.findFile("composer.json");
+    let result;
+    if (composer.success) {
+      await query.runComposerWordpress("rm -rf composer.lock");
+      await query.runComposerWordpress("composer install");
+      await query.runComposerWordpress("composer dump-autoload -o");
+      result = result = { success: true };
+    } else {
+      result = { success: true };
+    }
+
     // await query.runComposerWordpress("chown -R jenkins:userweb vendor");
     res.json({ data: result });
   } catch (e) {

@@ -20,7 +20,7 @@ async function get(req, res) {
     }
     let query = new WordpressQuery();
     query.moveDir(website);
-    let config = await query.getConfig(website);
+    let config = await query.getConfig();
     res.json({ data: config });
   } catch (e) {
     if (e.message === "ENOENT: no such file or directory, uv_chdir") {
@@ -47,7 +47,6 @@ async function create(req, res) {
     }
 
     let query = new WordpressQuery();
-    query.moveDir(website);
     let result = await query.createWpConfig(website);
     res.json({ data: result });
   } catch (e) {
@@ -69,7 +68,7 @@ async function edit(req, res) {
 
     let query = new WordpressQuery();
     query.moveDir(website);
-    let result = await query.editWpConfig(website, config);
+    let result = await query.editWpConfig(config);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

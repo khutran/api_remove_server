@@ -19,7 +19,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  runMigrate(website) {
+  runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand("php artisan migrate");
@@ -47,7 +47,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  seedMigrate(website) {
+  seedMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand("php artisan db:seed");
@@ -61,7 +61,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  createEnv(website) {
+  createEnv() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand("cp .env.example .env");
@@ -77,7 +77,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  editEnv(website, data) {
+  editEnv(data) {
     return new Promise(async (resolve, reject) => {
       try {
         let dataEnv = await this.readEnv(".env");
@@ -99,7 +99,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  getEnv(website) {
+  getEnv() {
     return new Promise(async (resolve, reject) => {
       try {
         let config = await this.readEnv(".env");
@@ -117,7 +117,7 @@ export default class LaravelQuery extends Query {
       }
     });
   }
-  runComposerLaravel(website, command) {
+  runComposerLaravel(command) {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(command);
@@ -131,7 +131,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  dump(res, website) {
+  dump(res) {
     return new Promise(async (resolve, reject) => {
       let config = await this.readEnv(".env");
       var sp = spawncmd(

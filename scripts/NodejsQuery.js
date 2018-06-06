@@ -19,7 +19,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  createDb() {
+  runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(
@@ -35,7 +35,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  seedDb() {
+  seedMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(
@@ -51,7 +51,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  createEnv(website) {
+  createEnv() {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand("cp .env.example .env");
@@ -67,7 +67,7 @@ export default class NodejsQuery extends Query {
     });
   }
 
-  editEnv(website, data) {
+  editEnv(data) {
     return new Promise(async (resolve, reject) => {
       try {
         let dataEnv = await this.readEnv(".env");
@@ -84,26 +84,6 @@ export default class NodejsQuery extends Query {
           resolve(true);
         });
       } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  getEnv(website) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let config = await this.readEnv(".env");
-        resolve(config);
-      } catch (e) {
-        if (e.message === "ENOENT: no such file or directory, uv_chdir") {
-          e.message = "website not build";
-          e.error_code = 204;
-        } else if (
-          e.message === "ENOENT: no such file or directory, open '.env'"
-        ) {
-          e.message = "website not config";
-          e.error_code = 104;
-        }
         reject(e);
       }
     });

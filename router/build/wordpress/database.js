@@ -46,7 +46,7 @@ async function download(req, res) {
   let website = req.query.website;
   let query = new WordpressQuery();
   query.moveDir(website);
-  await query.dump(res, website);
+  await query.dump(res);
 }
 
 async function importDb(req, res) {

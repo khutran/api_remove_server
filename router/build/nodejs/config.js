@@ -18,7 +18,7 @@ async function get(req, res) {
     }
     let query = new NodejsQuery();
     query.moveDir(website);
-    let result = await query.getEnv(website);
+    let result = await query.readEnv('.env');
     res.json({ data: result });
   } catch (e) {
     if (e.message === "ENOENT: no such file or directory, uv_chdir") {
@@ -45,7 +45,7 @@ async function create(req, res) {
     }
     let query = new NodejsQuery();
     query.moveDir(website);
-    let result = await query.createEnv(website);
+    let result = await query.createEnv();
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
@@ -62,7 +62,7 @@ async function edit(req, res) {
     let config = req.body.config;
     let query = new NodejsQuery();
     query.moveDir(website);
-    let result = await query.editEnv(website, config);
+    let result = await query.editEnv(config);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

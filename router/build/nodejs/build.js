@@ -25,8 +25,8 @@ async function buildFirts(req, res) {
 
     let query = new NodejsQuery();
     query.moveDir(website);
-    await query.createDb();
-    await query.seedDb();
+    await query.runMigrate();
+    await query.seedMigrate();
     await query.runBuild();
     res.json({ data: { success: true } });
   } catch (e) {
@@ -89,6 +89,7 @@ async function pull(req, res) {
 
     await query.pull(domain, git, branch, key, secret);
     await query.runBuild();
+    await query.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

@@ -129,6 +129,23 @@ export class Query {
     });
   }
 
+  findFolder(file) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`find -name ${file} -type f`);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        if (_.isEmpty(sp.stdout) && _.isEmpty(sp.stderr)) {
+          throw new Error(`${file} not found`);
+        }
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   findFolder(folder) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -186,7 +203,7 @@ export class Query {
     });
   }
 
-  runCommand(website, command) {
+  runCommand(command) {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = await this.filterCommand(command);
@@ -204,8 +221,8 @@ export class Query {
     return new Promise(async (resolve, reject) => {
       try {
         let dbname = website.replace(/[\.|\-]/gi, "");
-        dbname = dbname.replace('vicoderscom', '');
-        
+        dbname = dbname.replace("vicoderscom", "");
+
         if (dbname.length >= 10) {
           dbname = dbname.slice(0, 10);
         }
@@ -295,10 +312,13 @@ export class Query {
     });
   }
 
-  getSiteurl (db, frefix) {
+  getSiteurl(db, frefix) {
     return new Promise(async (resolve, reject) => {
       try {
-        let siteurl  = await models.sequelize.query(`SELECT * FROM ${db}.${frefix}options WHERE option_name = 'siteurl'`, { type: models.sequelize.QueryTypes.SELECT });
+        let siteurl = await models.sequelize.query(
+          `SELECT * FROM ${db}.${frefix}options WHERE option_name = 'siteurl'`,
+          { type: models.sequelize.QueryTypes.SELECT }
+        );
         resolve(siteurl[0].option_value);
       } catch (e) {
         reject(e);
@@ -306,16 +326,15 @@ export class Query {
     });
   }
 
-  replaceUrl(dbname, frefix, urlold, urlnew, https=false) {
+  replaceUrl(dbname, frefix, urlold, urlnew, https = false) {
     return new Promise(async (resolve, reject) => {
       try {
-
-        if(https === false) {
+        if (https === false) {
           urlnew = "http://" + urlnew;
         } else {
           urlnew = "https://" + urlnew;
         }
-           
+
         await models.sequelize.query(
           `UPDATE ${dbname}.${frefix}options SET option_value = replace(option_value, '${urlold}', '${urlnew}') WHERE option_name = 'home' OR option_name = 'siteurl'`
         );
@@ -436,7 +455,7 @@ export class Query {
   runYarn() {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand('yarn install');
+        let cmd = this.convertCommand("yarn install");
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
         });
@@ -466,7 +485,7 @@ export class Query {
       }
     });
   }
-  
+
   deleteP(website) {
     return new Promise(async (resolve, reject) => {
       try {
