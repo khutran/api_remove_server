@@ -41,6 +41,19 @@ export class Query {
     });
   }
 
+  chown(user, group) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`chown -R ${user}:${group} *`);
+        await spawn(cmd["cmd"], cmd["options"]);
+
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   findFile(file) {
     return new Promise(async (resolve, reject) => {
       try {

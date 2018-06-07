@@ -35,7 +35,7 @@ async function runComposer(req, res) {
       await query.runComposerWordpress("composer dump-autoload -o");
     }
 
-    // await query.runComposerWordpress("chown -R jenkins:userweb vendor");
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
