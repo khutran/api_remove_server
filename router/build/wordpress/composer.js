@@ -21,13 +21,13 @@ async function runComposer(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let file = await query.findFile("composer.json");
-    // _.forEach(file, item => {
-    //   if (item.indexOf("themes") > -1) {
-    //     path = item.slice(1, -13);
-    //   }
-    // });
+    _.forEach(file, item => {
+      if (item.indexOf("themes") > -1) {
+        path = item.slice(1, -13);
+      }
+    });
 
-    console.log(file);
+    console.log(path);
     // query.moveDir(website, path);
 
     // let composer = await query.findFile("composer.json");
