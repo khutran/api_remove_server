@@ -39,7 +39,7 @@ async function buildFirts(req, res) {
       config["DB_HOST"],
       file[file.length - 1].slice(11)
     );
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON);
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
@@ -120,7 +120,7 @@ async function pull(req, res) {
     let query = new Git();
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON);
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

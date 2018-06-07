@@ -28,7 +28,7 @@ async function buildFirts(req, res) {
     await query.runMigrate();
     await query.seedMigrate();
     await query.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON);
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -91,7 +91,7 @@ async function pull(req, res) {
 
     await query.pull(domain, git, branch, key, secret);
     await queryN.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON);
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     if (process.env.MIGRATE_NODE === true) {
       await queryN.runMigrate();
     }

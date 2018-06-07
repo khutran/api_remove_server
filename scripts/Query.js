@@ -41,10 +41,10 @@ export class Query {
     });
   }
 
-  chown(user, group) {
+  chown(user, group, website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand(`chown -R ${user}:${group} *`);
+        let cmd = this.convertCommand(`chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`);
         await spawn(cmd["cmd"], cmd["options"]);
 
         resolve({ success: true });
