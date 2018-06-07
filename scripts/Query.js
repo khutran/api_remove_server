@@ -469,11 +469,11 @@ export class Query {
   // }
 
   restartPm2(website) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(`pm2 restart ${website}`);
-        await spawn(cmd["cmd", cmd["options"]]);
-        resolve({success: true});
+        await spawn(cmd[("cmd", cmd["options"])]);
+        resolve({ success: true });
       } catch (e) {
         reject(e);
       }
