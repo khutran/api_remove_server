@@ -44,7 +44,9 @@ export class Query {
   chown(user, group, website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand(`chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`);
+        let cmd = this.convertCommand(
+          `chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`
+        );
         await spawn(cmd["cmd"], cmd["options"]);
 
         resolve({ success: true });
@@ -465,6 +467,18 @@ export class Query {
   //     }
   //   });
   // }
+
+  restartPm2(website) {
+    return new Promise((resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`pm2 restart ${website}`);
+        await spawn(cmd["cmd", cmd["options"]]);
+        resolve({success: true});
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 
   deleteP(website) {
     return new Promise(async (resolve, reject) => {
