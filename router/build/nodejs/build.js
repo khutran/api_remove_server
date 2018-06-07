@@ -85,11 +85,12 @@ async function pull(req, res) {
     let secret = req.body.secret;
 
     let query = new Git();
+    let queryN = new NodejsQuery();
     query.moveDir(domain);
 
     await query.pull(domain, git, branch, key, secret);
-    await query.runBuild();
-    await query.runMigrate();
+    await queryN.runBuild();
+    await queryN.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

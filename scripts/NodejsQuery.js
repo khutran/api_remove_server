@@ -19,6 +19,40 @@ export default class NodejsQuery extends Query {
     });
   }
 
+  runYarn() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand("yarn install");
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  runBuild(website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let data = JSON.parse(fs.readFileSync("package.json"));
+
+        if (_.isNil(data.scripts.build)) {
+          reject({ message: "project not script build", error_code: 204 });
+        }
+
+        let cmd = this.convertCommand("yarn build");
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+  
   runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
