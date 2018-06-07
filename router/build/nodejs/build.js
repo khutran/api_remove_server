@@ -90,7 +90,7 @@ async function pull(req, res) {
 
     await query.pull(domain, git, branch, key, secret);
     await queryN.runBuild();
-    await queryN.runMigrate();
+    // await queryN.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

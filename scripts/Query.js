@@ -174,6 +174,7 @@ export class Query {
         case "php":
         case "composer":
         case "npm":
+        case "yarn":
           resolve(result);
           break;
         default:
