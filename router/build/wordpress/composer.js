@@ -27,23 +27,16 @@ async function runComposer(req, res) {
       }
     });
 
-    console.log(path);
-    // query.moveDir(website, path);
+    if (!_.isNil(path)) {
+      query.moveDir(website, path);
 
-    // let composer = await query.findFile("composer.json");
-    // console.log(fs.existsSync('composer.json'));
-    // let result;
-    // if (fs.existsSync('composer.json')) {
-    //   await query.runComposerWordpress("rm -rf composer.lock");
-    //   await query.runComposerWordpress("composer install");
-    //   await query.runComposerWordpress("composer dump-autoload -o");
-    //   result = result = { success: true };
-    // } else {
-    //   result = { success: true };
-    // }
+      await query.runComposerWordpress("rm -rf composer.lock");
+      await query.runComposerWordpress("composer install");
+      await query.runComposerWordpress("composer dump-autoload -o");
+    }
 
     // await query.runComposerWordpress("chown -R jenkins:userweb vendor");
-    res.json({ data: 'result' });
+    res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
