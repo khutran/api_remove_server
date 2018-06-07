@@ -472,7 +472,7 @@ export class Query {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(`pm2 restart ${website}`);
-        await spawn(cmd[("cmd", cmd["options"])]);
+        await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
         reject(e);

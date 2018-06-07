@@ -91,7 +91,7 @@ async function pull(req, res) {
 
     await query.pull(domain, git, branch, key, secret);
     await queryN.runBuild();
-    await queryN.restartPm2(domain);
+    await query.restartPm2(domain);
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     if (process.env.MIGRATE_NODE === true) {
       await queryN.runMigrate();
