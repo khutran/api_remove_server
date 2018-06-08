@@ -1,5 +1,5 @@
 import express from "express";
-import NodejsQuery from "../../../scripts/NodejsQuery";
+import  AngularQuery from "../../../scripts/AngularQuery";
 import Git from "../../../scripts/Git";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
@@ -22,11 +22,8 @@ async function buildFirts(req, res) {
     if (!website) {
       throw new Error("website not empty");
     }
-
-    let query = new NodejsQuery();
+    let query = new AngularQuery();
     query.moveDir(website);
-    await query.runMigrate();
-    await query.seedMigrate();
     await query.runBuild();
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { success: true } });
@@ -41,14 +38,14 @@ async function buildFirts(req, res) {
 
 async function download(req, res) {
   let website = req.query.website;
-  let query = new NodejsQuery();
+  let query = new AngularQuery();
   await query.compressed(website, res);
 }
 
 async function get(req, res) {
   try {
     let website = req.query.website;
-    let query = new NodejsQuery();
+    let query = new AngularQuery();
     query.moveDir(website);
     res.json({ success: true });
   } catch (e) {
@@ -86,13 +83,12 @@ async function pull(req, res) {
     let secret = req.body.secret;
 
     let query = new Git();
-    let queryN = new NodejsQuery();
+    let queryN = new AngularQuery();
     query.moveDir(domain);
 
     await query.pull(domain, git, branch, key, secret);
     await queryN.buildInstall();
     await queryN.runBuild();
-    await query.restartPm2(domain);
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     if (process.env.MIGRATE_NODE === true) {
       await queryN.runMigrate();
@@ -117,7 +113,7 @@ async function deleteP(req, res) {
       throw new Error("permisson define", 403);
     }
 
-    let query = new NodejsQuery();
+    let query = new AngularQuery();
     query.moveDir(website);
     let result = await query.deleteP(website);
 

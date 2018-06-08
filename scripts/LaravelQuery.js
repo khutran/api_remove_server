@@ -5,20 +5,6 @@ import * as _ from "lodash";
 const spawncmd = require("child_process").spawn;
 
 export default class LaravelQuery extends Query {
-  runTest(website) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let cmd = this.convertCommand("php artisan make:test UserTest --unit");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
   runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -64,6 +50,13 @@ export default class LaravelQuery extends Query {
   createEnv() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync(".env.example") === false) {
+          reject({
+            message: "project not .env.example",
+            error_code: 204
+          });
+        }
+
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
@@ -80,6 +73,13 @@ export default class LaravelQuery extends Query {
   editEnv(data) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync(".env") === false) {
+          reject({
+            message: "project not .env",
+            error_code: 204
+          });
+        }
+
         let dataEnv = await this.readEnv(".env");
         _.mapKeys(data, (value, key) => {
           dataEnv[key] = `${data[key]}`;
@@ -102,6 +102,12 @@ export default class LaravelQuery extends Query {
   getEnv() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync(".env") === false) {
+          reject({
+            message: "project not .env",
+            error_code: 204
+          });
+        }
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
@@ -109,7 +115,8 @@ export default class LaravelQuery extends Query {
           e.message = "website not build";
           e.error_code = 204;
         } else if (
-          e.message === "ENOENT: no such file or directory, open '.env'") {
+          e.message === "ENOENT: no such file or directory, open '.env'"
+        ) {
           e.message = "website not config";
           e.error_code = 104;
         }
@@ -133,6 +140,13 @@ export default class LaravelQuery extends Query {
 
   dump(res) {
     return new Promise(async (resolve, reject) => {
+      if (fs.existsSync(".env") === false) {
+        reject({
+          message: "project not .env",
+          error_code: 204
+        });
+      }
+
       let config = await this.readEnv(".env");
       var sp = spawncmd(
         "mysqldump",

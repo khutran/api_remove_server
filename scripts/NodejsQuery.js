@@ -2,31 +2,31 @@ const spawn = require("child-process-promise").spawn;
 import fs from "fs";
 import { Query } from "./Query";
 import * as _ from "lodash";
+import async from "async";
 const spawncmd = require("child_process").spawn;
 
 export default class NodejsQuery extends Query {
-  npmInstall(website) {
+  buildInstall() {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("npm install");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  runYarn() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let cmd = this.convertCommand("yarn install");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        let command;
+        async.series(
+          [
+            function(callback) {
+              if (Boolean(process.env.YARN) === true) {
+                callback(null, "yarn");
+              } else {
+                callback(null, "npm");
+              }
+            }
+          ],
+          function(err, result) {
+            return (command = result[0]);
+          }
+        );
+        let cmd = this.convertCommand(`${command} install`);
+        await spawn(cmd["cmd"], cmd["options"]);
+        resolve({ success: true });
       } catch (e) {
         reject(e);
       }
@@ -36,6 +36,13 @@ export default class NodejsQuery extends Query {
   runBuild(website) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync("package.json") === false) {
+          reject({
+            message: "project not package.json",
+            error_code: 204
+          });
+        }
+
         let data = JSON.parse(fs.readFileSync("package.json"));
 
         if (_.isNil(data.scripts.build)) {
@@ -52,10 +59,16 @@ export default class NodejsQuery extends Query {
       }
     });
   }
-  
+
   runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+          reject({
+            message: "project not install sequelize",
+            error_code: 204
+          });
+        }
         let cmd = this.convertCommand(
           "./node_modules/.bin/sequelize db:migrate"
         );
@@ -72,6 +85,12 @@ export default class NodejsQuery extends Query {
   seedMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+          reject({
+            message: "project not install sequelize",
+            error_code: 204
+          });
+        }
         let cmd = this.convertCommand(
           "./node_modules/.bin/sequelize db:seed:all"
         );
@@ -88,6 +107,13 @@ export default class NodejsQuery extends Query {
   createEnv() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync(".env.example") === false) {
+          reject({
+            message: "project not .env.example",
+            error_code: 204
+          });
+        }
+
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
@@ -104,6 +130,13 @@ export default class NodejsQuery extends Query {
   editEnv(data) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync(".env") === false) {
+          reject({
+            message: "project not .env",
+            error_code: 204
+          });
+        }
+
         let dataEnv = await this.readEnv(".env");
         _.mapKeys(data, (value, key) => {
           dataEnv[key] = `${data[key]}`;
@@ -125,6 +158,13 @@ export default class NodejsQuery extends Query {
 
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
+      if (fs.existsSync(".env") === false) {
+        reject({
+          message: "project not .env",
+          error_code: 204
+        });
+      }
+
       let config = await this.readEnv(".env");
       var sp = spawncmd(
         "mysqldump",
@@ -145,5 +185,4 @@ export default class NodejsQuery extends Query {
       sp.stdout.pipe(res);
     });
   }
-
 }

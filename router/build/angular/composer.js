@@ -1,5 +1,5 @@
 import express from "express";
-import NodejsQuery from "../../../scripts/NodejsQuery";
+import AngularQuery from "../../../scripts/AngularQuery";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
 import AuthMiddleware from "../../../midlewares/AuthMiddleware";
@@ -15,9 +15,9 @@ async function runComposer(req, res) {
       throw new Error("website not empty");
     }
 
-    let query = new NodejsQuery();
+    let query = new AngularQuery();
     query.moveDir(website);
-    let q = await query.buildInstall();
+    await query.buildInstall();
 
     res.json({ data: { success: true } });
   } catch (e) {

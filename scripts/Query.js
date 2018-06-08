@@ -9,19 +9,27 @@ import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
 import { Domain } from "domain";
 import archiver from "archiver";
+
 var archive = archiver("zip", {
   zlib: { level: 9 } // Sets the compression level.
 });
 
 export class Query {
   moveDir(website = null, link = "") {
-    let path;
-    if (website === null) {
-      path = process.env.PATH_WEB;
-    } else {
-      path = `${process.env.PATH_WEB}/${website}/workspace${link}`;
+    try {
+      let path;
+      if (website === null) {
+        path = process.env.PATH_WEB;
+      } else {
+        path = `${process.env.PATH_WEB}/${website}/workspace${link}`;
+      }
+      process.chdir(path);
+    } catch (e) {
+      reject({
+        message: "website not found",
+        error_code: 204
+      });
     }
-    process.chdir(path);
   }
 
   convertCommand(cmd) {
@@ -44,10 +52,16 @@ export class Query {
   chown(user, group, website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand(
-          `chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`
-        );
-        await spawn(cmd["cmd"], cmd["options"]);
+        let cmd;
+        if (process.env.PATH_WEB) {
+          cmd = this.convertCommand(
+            `chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`
+          );
+        }
+
+        if (cmd["cmd"]) {
+          await spawn(cmd["cmd"], cmd["options"]);
+        }
 
         resolve({ success: true });
       } catch (e) {
@@ -56,6 +70,7 @@ export class Query {
     });
   }
 
+  //find path file
   findFile(file) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -79,6 +94,13 @@ export class Query {
 
   readFile(path) {
     return new Promise(async (resolve, reject) => {
+      if (fs.existsSync(path) === false) {
+        reject({
+          message: `${path} not found`,
+          error_code: 204
+        });
+      }
+
       fs.readFile(path, (err, data) => {
         if (err) {
           reject(err);
@@ -91,6 +113,14 @@ export class Query {
   readEnv(path) {
     return new Promise(async (resolve, reject) => {
       let obj = {};
+
+      if (fs.existsSync(path) === false) {
+        reject({
+          message: `${path} not found`,
+          error_code: 204
+        });
+      }
+
       fs.readFile(path, (err, data) => {
         if (err) {
           reject(err);
@@ -116,6 +146,13 @@ export class Query {
   readConfig(path) {
     return new Promise(async (resolve, reject) => {
       let obj = {};
+      if (fs.existsSync(path) === false) {
+        reject({
+          message: `${path} not found`,
+          error_code: 204
+        });
+      }
+      
       fs.readFile(path, (err, data) => {
         if (err) {
           reject(err);
@@ -412,61 +449,6 @@ export class Query {
       }
     });
   }
-
-  // clone(domain, url, branch, key, secret) {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       let git = new Git();
-  //       url = url.split("@");
-  //       let urlGit = `https://${key}:${secret}@${url[1]}`;
-  //       let clone = await git.Clone(Domain, urlGit, branch);
-  //  let path = await this.creatFolder(domain);
-  //   this.moveDir(domain);
-  // let cmd  = this.convertCommand(`git clone ${urlGit} ./`);
-  // await spawn(cmd["cmd"], cmd["options"]);
-  // let repo = await Git.Clone(urlGit, "./");
-  // await this.createLocalBranch(repo, branch);
-  // await this.checkout(repo, branch);
-  //       resolve({ data: { success: true } });
-  //     } catch (e) {
-  //       reject(e);
-  //     }
-  //   });
-  // }
-
-  // async createLocalBranch(repo, branch) {
-  //   let reference = await repo.getBranch(`refs/remotes/origin/${branch}`);
-  //   await repo.checkoutRef(reference);
-  //   const commit = await repo.getHeadCommit();
-  //   await repo.createBranch(branch, commit, 1);
-  //   await repo.mergeBranches(branch, `remotes/origin/${branch}`);
-  // }
-
-  // async checkout(repo, branch) {
-  //   let reference = await repo.getBranch(branch);
-  //   await repo.checkoutRef(reference);
-  // }
-
-  // pull(domain, url, branch, key, secret) {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       let git = new Git();
-  // let path = await this.getPath(domain);
-  // let repo = await Git.Repository.open(path.path);
-  // let remote = await repo.getRemote("origin");
-  // await repo.fetch(remote, {
-  //   downloadTags: 1,
-  //   prune: 1,
-  //   updateFetchhead: 1
-  // });
-  // await this.createLocalBranch(repo, branch);
-  // await this.checkout(repo, branch);
-  //       resolve({ data: { success: true } });
-  //     } catch (e) {
-  //       reject(e);
-  //     }
-  //   });
-  // }
 
   restartPm2(website) {
     return new Promise(async (resolve, reject) => {

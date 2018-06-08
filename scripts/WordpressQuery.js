@@ -11,13 +11,22 @@ export default class WordpressQuery extends Query {
   getConfig() {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync("wp-config.php") === false) {
+          reject({
+            message: `wp-config.php not found`,
+            error_code: 204
+          });
+        }
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
         if (e.message === "ENOENT: no such file or directory, uv_chdir") {
           e.message = "website not build";
           e.error_code = 204;
-        } else if (e.message === "ENOENT: no such file or directory, open 'wp-config.php'"){
+        } else if (
+          e.message ===
+          "ENOENT: no such file or directory, open 'wp-config.php'"
+        ) {
           e.message = "website not config";
           e.error_code = 104;
         }
@@ -64,6 +73,12 @@ export default class WordpressQuery extends Query {
   editWpConfig(data) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync("wp-config.php") === false) {
+          reject({
+            message: `wp-config.php not found`,
+            error_code: 204
+          });
+        }
         let filewpconfig = await this.readFile("wp-config.php");
         let file = await this.readConfig("wp-config.php");
         filewpconfig = _.split(filewpconfig, "\n");
@@ -166,6 +181,12 @@ export default class WordpressQuery extends Query {
 
   dump(res) {
     return new Promise(async (resolve, reject) => {
+      if (fs.existsSync("wp-config.php") === false) {
+        reject({
+          message: `wp-config.php not found`,
+          error_code: 204
+        });
+      }
       let config = await this.readConfig("wp-config.php");
       var sp = spawncmd(
         "mysqldump",
@@ -190,6 +211,12 @@ export default class WordpressQuery extends Query {
   importNewDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (fs.existsSync('wp-config.php') === false) {
+          reject({
+            message: `wp-config.php not found`,
+            error_code: 204
+          });
+        }
         let config = await this.readConfig("wp-config.php");
         await this.backupDatabase(
           config["DB_USER"],
