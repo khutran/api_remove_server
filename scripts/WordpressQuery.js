@@ -20,17 +20,8 @@ export default class WordpressQuery extends Query {
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
-        if (e.message === "ENOENT: no such file or directory, uv_chdir") {
-          e.message = "website not build";
-          e.error_code = 204;
-        } else if (
-          e.message ===
-          "ENOENT: no such file or directory, open 'wp-config.php'"
-        ) {
-          e.message = "website not config";
-          e.error_code = 104;
-        }
-        reject(e);
+        console.log('xxxxxxx');
+        reject(e.message);
       }
     });
   }

@@ -9,6 +9,6 @@ let router = express.Router();
 router.use("/wordpress", wordpress);
 router.use("/laravel", laravel);
 router.use("/nodejs", nodejs);
-router.use("/angular", angular);
+router.use("/angular4", angular);
 
 export default router;

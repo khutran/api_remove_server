@@ -25,10 +25,7 @@ export class Query {
       }
       process.chdir(path);
     } catch (e) {
-      reject({
-        message: "website not found",
-        error_code: 204
-      });
+      throw new Error('website not build', 204);
     }
   }
 
