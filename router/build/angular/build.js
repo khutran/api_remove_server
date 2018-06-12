@@ -25,7 +25,7 @@ async function buildFirts(req, res) {
     let query = new AngularQuery();
     query.moveDir(website);
     await query.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

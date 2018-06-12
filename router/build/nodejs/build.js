@@ -90,7 +90,7 @@ async function pull(req, res) {
     query.moveDir(domain);
 
     await query.pull(domain, git, branch, key, secret);
-    await queryN.buildInstall();
+    // await queryN.buildInstall();
     await queryN.runBuild();
     await query.restartPm2(domain);
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
