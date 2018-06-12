@@ -20,7 +20,6 @@ export default class WordpressQuery extends Query {
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
-        console.log('xxxxxxx');
         reject(e.message);
       }
     });
@@ -43,6 +42,19 @@ export default class WordpressQuery extends Query {
   createWpConfig(website) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (
+          fs.existsSync(
+            `${process.env.PATH_WEB}/${website}/workspace/wp-config.php`
+          ) === true
+        ) {
+          this.moveDir(website);
+          let file = await this.readConfig("wp-config.php");
+          // for (let i in file) {
+          //   file[i] = "";
+          // }
+          resolve(file);
+        }
+
         let cmd = this.convertCommand(
           `cp ${__dirname}/../assets/demo/wp-config-sample.php ${
             process.env.PATH_WEB
@@ -51,9 +63,9 @@ export default class WordpressQuery extends Query {
         await spawn(cmd["cmd"], cmd["options"]);
         this.moveDir(website);
         let file = await this.readConfig("wp-config.php");
-        for (let i in file) {
-          file[i] = "";
-        }
+        // for (let i in file) {
+        //   file[i] = "";
+        // }
         resolve(file);
       } catch (e) {
         reject(e.message);
@@ -202,7 +214,7 @@ export default class WordpressQuery extends Query {
   importNewDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        if (fs.existsSync('wp-config.php') === false) {
+        if (fs.existsSync("wp-config.php") === false) {
           reject({
             message: `wp-config.php not found`,
             error_code: 204
