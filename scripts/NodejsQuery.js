@@ -63,19 +63,26 @@ export default class NodejsQuery extends Query {
   runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
-        if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+            reject({
+              message: "project not install sequelize",
+              error_code: 204
+            });
+          }
+          let cmd = this.convertCommand(
+            "./node_modules/.bin/sequelize db:migrate"
+          );
+          let sp = await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
+          resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        } else {
           reject({
-            message: "project not install sequelize",
-            error_code: 204
+            message: "framework can not database",
+            error_code: 500
           });
         }
-        let cmd = this.convertCommand(
-          "./node_modules/.bin/sequelize db:migrate"
-        );
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
         reject(e);
       }
@@ -85,19 +92,26 @@ export default class NodejsQuery extends Query {
   seedMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
-        if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          if (fs.existsSync("./node_modules/.bin/sequelize") === false) {
+            reject({
+              message: "project not install sequelize",
+              error_code: 204
+            });
+          }
+          let cmd = this.convertCommand(
+            "./node_modules/.bin/sequelize db:seed:all"
+          );
+          let sp = await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
+          resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        } else {
           reject({
-            message: "project not install sequelize",
-            error_code: 204
+            message: "framework can not database",
+            error_code: 500
           });
         }
-        let cmd = this.convertCommand(
-          "./node_modules/.bin/sequelize db:seed:all"
-        );
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
         reject(e);
       }
@@ -158,31 +172,41 @@ export default class NodejsQuery extends Query {
 
   dump(res, website) {
     return new Promise(async (resolve, reject) => {
-      if (fs.existsSync(".env") === false) {
+      if (Boolean(process.env.MYSQL_ON) === true) {
+        if (fs.existsSync(".env") === false) {
+          reject({
+            message: "project not .env",
+            error_code: 204
+          });
+        }
+
+        let config = await this.readEnv(".env");
+        var sp = spawncmd(
+          "mysqldump",
+          [
+            "-u" + config["DB_USER"],
+            "-p" + config["DB_PASS"],
+            "-h" + config["DB_HOST"],
+            config["DB_NAME"],
+            "--default-character-set=utf8",
+            "--comments"
+          ],
+          {
+            highWaterMark: 16 * 1024
+          }
+        );
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader(
+          "Content-disposition",
+          `filename=${config["DB_NAME"]}.sql`
+        );
+        sp.stdout.pipe(res);
+      } else {
         reject({
-          message: "project not .env",
-          error_code: 204
+          message: "framework can not database",
+          error_code: 500
         });
       }
-
-      let config = await this.readEnv(".env");
-      var sp = spawncmd(
-        "mysqldump",
-        [
-          "-u" + config["DB_USER"],
-          "-p" + config["DB_PASS"],
-          "-h" + config["DB_HOST"],
-          config["DB_NAME"],
-          "--default-character-set=utf8",
-          "--comments"
-        ],
-        {
-          highWaterMark: 16 * 1024
-        }
-      );
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader("Content-disposition", `filename=${config["DB_NAME"]}.sql`);
-      sp.stdout.pipe(res);
     });
   }
 }

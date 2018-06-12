@@ -8,11 +8,18 @@ export default class LaravelQuery extends Query {
   runMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("php artisan migrate");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let cmd = this.convertCommand("php artisan migrate");
+          let sp = await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
+          resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -22,11 +29,18 @@ export default class LaravelQuery extends Query {
   resetMigrate(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("php artisan migrate:refresh");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let cmd = this.convertCommand("php artisan migrate:refresh");
+          let sp = await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
+          resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -36,11 +50,18 @@ export default class LaravelQuery extends Query {
   seedMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand("php artisan db:seed");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let cmd = this.convertCommand("php artisan db:seed");
+          let sp = await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
+          resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -140,34 +161,41 @@ export default class LaravelQuery extends Query {
 
   dump(res) {
     return new Promise(async (resolve, reject) => {
-      if (fs.existsSync(".env") === false) {
+      if (Boolean(process.env.MYSQL_ON) === true) {
+        if (fs.existsSync(".env") === false) {
+          reject({
+            message: "project not .env",
+            error_code: 204
+          });
+        }
+
+        let config = await this.readEnv(".env");
+        var sp = spawncmd(
+          "mysqldump",
+          [
+            "-u" + config["DB_USERNAME"],
+            "-p" + config["DB_PASSWORD"],
+            "-h" + config["DB_HOST"],
+            config["DB_DATABASE"],
+            "--default-character-set=utf8",
+            "--comments"
+          ],
+          {
+            highWaterMark: 16 * 1024
+          }
+        );
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader(
+          "Content-disposition",
+          `filename=${config["DB_DATABASE"]}.sql`
+        );
+        sp.stdout.pipe(res);
+      } else {
         reject({
-          message: "project not .env",
-          error_code: 204
+          message: "framework can not database",
+          error_code: 500
         });
       }
-
-      let config = await this.readEnv(".env");
-      var sp = spawncmd(
-        "mysqldump",
-        [
-          "-u" + config["DB_USERNAME"],
-          "-p" + config["DB_PASSWORD"],
-          "-h" + config["DB_HOST"],
-          config["DB_DATABASE"],
-          "--default-character-set=utf8",
-          "--comments"
-        ],
-        {
-          highWaterMark: 16 * 1024
-        }
-      );
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader(
-        "Content-disposition",
-        `filename=${config["DB_DATABASE"]}.sql`
-      );
-      sp.stdout.pipe(res);
     });
   }
 }

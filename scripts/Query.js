@@ -25,7 +25,7 @@ export class Query {
       }
       process.chdir(path);
     } catch (e) {
-      throw new Error('website not build', 204);
+      throw new Error("website not build", 204);
     }
   }
 
@@ -149,7 +149,7 @@ export class Query {
           error_code: 204
         });
       }
-      
+
       fs.readFile(path, (err, data) => {
         if (err) {
           reject(err);
@@ -270,27 +270,34 @@ export class Query {
   createUserDb(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let dbname = website.replace(/[\.|\-]/gi, "");
-        dbname = dbname.replace("vicoderscom", "");
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let dbname = website.replace(/[\.|\-]/gi, "");
+          dbname = dbname.replace("vicoderscom", "");
 
-        if (dbname.length >= 10) {
-          dbname = dbname.slice(0, 10);
+          if (dbname.length >= 10) {
+            dbname = dbname.slice(0, 10);
+          }
+
+          let password = randomstring.generate(8);
+          let data = {
+            Host: process.env["MYSQL_HOST_USER"],
+            User: `${dbname}_user`,
+            plugin: "mysql_native_password",
+            authentication_string: password,
+            password_last_changed: new Date()
+          };
+
+          let user = await models.user.create(data);
+          resolve(data);
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
         }
-
-        let password = randomstring.generate(8);
-        let data = {
-          Host: process.env["MYSQL_HOST_USER"],
-          User: `${dbname}_user`,
-          plugin: "mysql_native_password",
-          authentication_string: password,
-          password_last_changed: new Date()
-        };
-
-        let user = await models.user.create(data);
-        resolve(data);
       } catch (e) {
         if (e.message === "Validation error") {
-          e.message = "Db or user exits";
+          return (e.message = "Db or user exits");
         }
         reject(e);
       }
@@ -300,11 +307,18 @@ export class Query {
   exportDatabase(user, password, host, dbname) {
     return new Promise(async (resolve, reject) => {
       try {
-        let ex = await exec(
-          `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > database/${dbname}.sql`
-        );
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let ex = await exec(
+            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > database/${dbname}.sql`
+          );
 
-        resolve({ success: true, database: `${dbname}.sql` });
+          resolve({ success: true, database: `${dbname}.sql` });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject({ success: false, database: "" });
       }
@@ -314,11 +328,17 @@ export class Query {
   backupDatabase(user, password, host, dbname) {
     return new Promise(async (resolve, reject) => {
       try {
-        let ex = await exec(
-          `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > /var/www/backupdatabase/${dbname}.sql`
-        );
-
-        resolve({ success: true, database: `${dbname}.sql` });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let ex = await exec(
+            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > /var/www/backupdatabase/${dbname}.sql`
+          );
+          resolve({ success: true, database: `${dbname}.sql` });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject({ success: false, database: "" });
       }
@@ -328,9 +348,16 @@ export class Query {
   resetDatabase(database) {
     return new Promise(async (resolve, reject) => {
       try {
-        await models.sequelize.query(`DROP DATABASE ${database}`);
-        await models.sequelize.query(`CREATE DATABASE ${database}`);
-        resolve({ success: true });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          await models.sequelize.query(`DROP DATABASE ${database}`);
+          await models.sequelize.query(`CREATE DATABASE ${database}`);
+          resolve({ success: true });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject({ success: false });
       }
@@ -340,9 +367,16 @@ export class Query {
   deleteDatabase(user, db) {
     return new Promise(async (resolve, reject) => {
       try {
-        await models.sequelize.query(`DROP DATABASE ${db}`);
-        await models.sequelize.query(`DROP USER ${user}`);
-        resolve({ success: true });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          await models.sequelize.query(`DROP DATABASE ${db}`);
+          await models.sequelize.query(`DROP USER ${user}`);
+          resolve({ success: true });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -352,10 +386,17 @@ export class Query {
   importDatabase(user, password, dbname, host, impotdb) {
     return new Promise(async (resolve, reject) => {
       try {
-        await exec(
-          `mysql -u ${user} -p${password} ${dbname} -h ${host} < database/${impotdb}`
-        );
-        resolve({ success: true });
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          await exec(
+            `mysql -u ${user} -p${password} ${dbname} -h ${host} < database/${impotdb}`
+          );
+          resolve({ success: true });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -365,11 +406,18 @@ export class Query {
   getSiteurl(db, frefix) {
     return new Promise(async (resolve, reject) => {
       try {
-        let siteurl = await models.sequelize.query(
-          `SELECT * FROM ${db}.${frefix}options WHERE option_name = 'siteurl'`,
-          { type: models.sequelize.QueryTypes.SELECT }
-        );
-        resolve(siteurl[0].option_value);
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let siteurl = await models.sequelize.query(
+            `SELECT * FROM ${db}.${frefix}options WHERE option_name = 'siteurl'`,
+            { type: models.sequelize.QueryTypes.SELECT }
+          );
+          resolve(siteurl[0].option_value);
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject(e);
       }
@@ -379,28 +427,35 @@ export class Query {
   replaceUrl(dbname, frefix, urlold, urlnew, https = false) {
     return new Promise(async (resolve, reject) => {
       try {
-        if (https === false) {
-          urlnew = "http://" + urlnew;
-        } else {
-          urlnew = "https://" + urlnew;
-        }
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          if (https === false) {
+            urlnew = "http://" + urlnew;
+          } else {
+            urlnew = "https://" + urlnew;
+          }
 
-        await models.sequelize.query(
-          `UPDATE ${dbname}.${frefix}options SET option_value = replace(option_value, '${urlold}', '${urlnew}') WHERE option_name = 'home' OR option_name = 'siteurl'`
-        );
-        await models.sequelize.query(
-          `UPDATE ${dbname}.${frefix}posts SET guid = replace(guid, '${urlold}', '${urlnew}')`
-        );
-        await models.sequelize.query(
-          `UPDATE ${dbname}.${frefix}posts SET post_content = replace(post_content, '${urlold}', '${urlnew}')`
-        );
-        await models.sequelize.query(
-          `UPDATE ${dbname}.${frefix}posts SET post_excerpt = replace(post_excerpt, '${urlold}', '${urlnew}')`
-        );
-        await models.sequelize.query(
-          `UPDATE ${dbname}.${frefix}postmeta SET meta_value = replace(meta_value, '${urlold}', '${urlnew}')`
-        );
-        resolve({ suscess: true });
+          await models.sequelize.query(
+            `UPDATE ${dbname}.${frefix}options SET option_value = replace(option_value, '${urlold}', '${urlnew}') WHERE option_name = 'home' OR option_name = 'siteurl'`
+          );
+          await models.sequelize.query(
+            `UPDATE ${dbname}.${frefix}posts SET guid = replace(guid, '${urlold}', '${urlnew}')`
+          );
+          await models.sequelize.query(
+            `UPDATE ${dbname}.${frefix}posts SET post_content = replace(post_content, '${urlold}', '${urlnew}')`
+          );
+          await models.sequelize.query(
+            `UPDATE ${dbname}.${frefix}posts SET post_excerpt = replace(post_excerpt, '${urlold}', '${urlnew}')`
+          );
+          await models.sequelize.query(
+            `UPDATE ${dbname}.${frefix}postmeta SET meta_value = replace(meta_value, '${urlold}', '${urlnew}')`
+          );
+          resolve({ suscess: true });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         reject({ suscess: false });
       }

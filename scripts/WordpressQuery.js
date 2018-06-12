@@ -112,70 +112,77 @@ export default class WordpressQuery extends Query {
   renameProject(website, webnew, firts = "http://") {
     return new Promise(async (resolve, reject) => {
       try {
-        let config;
-        if (fs.existsSync("database") === false) {
-          await spawn("mkdir", ["database"]);
-        }
-        if (fs.existsSync(".env")) {
-          config = await this.readEnv(".env");
-        } else if (fs.existsSync("wp-config.php")) {
-          config = await this.readConfig("wp-config.php");
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          let config;
+          if (fs.existsSync("database") === false) {
+            await spawn("mkdir", ["database"]);
+          }
+          if (fs.existsSync(".env")) {
+            config = await this.readEnv(".env");
+          } else if (fs.existsSync("wp-config.php")) {
+            config = await this.readConfig("wp-config.php");
+          } else {
+            throw new Error("Not find file config", 1000);
+          }
+
+          let db = await this.exportDatabase(
+            config["DB_USER"],
+            config["DB_PASSWORD"],
+            config["DB_HOST"],
+            config["DB_NAME"]
+          );
+
+          let user = await models.user.findOne({
+            where: { User: config["DB_USER"] }
+          });
+          let result = await user.destroy();
+
+          if (!result) {
+            throw new Error("Delete User false", 1000);
+          }
+
+          let newconfig = await this.createUserDb(webnew);
+          let data = {
+            DB_USER: newconfig["User"],
+            DB_PASSWORD: newconfig["authentication_string"],
+            DB_NAME: `${newconfig["User"]}_db`
+          };
+
+          await this.editWpConfig(website, data);
+          await this.importDatabase(
+            data["DB_USER"],
+            data["DB_PASSWORD"],
+            data["DB_NAME"],
+            db["database"]
+          );
+          let webold = await models.sequelize.query(
+            `SELECT \`option_value\` FROM \`${data["DB_NAME"]}\`.\`${
+              config["PREFIX"]
+            }options\` WHERE \`option_name\` = 'siteurl'`,
+            { type: models.sequelize.QueryTypes.SELECT }
+          );
+          webold = webold[0].option_value;
+
+          let replace = await this.replaceUrl(
+            data["DB_NAME"],
+            config["PREFIX"],
+            webold,
+            `${firts}${webnew}`
+          );
+
+          if (replace.success === false) {
+            throw new Error("Replace url false", 1000);
+          }
+          this.moveDir();
+          let cmd = this.convertCommand(`mv ${website} ${webnew}`);
+          let sp = await spawn(cmd["cmd"], cmd["options"]);
+          resolve(replace);
         } else {
-          throw new Error("Not find file config", 1000);
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
         }
-
-        let db = await this.exportDatabase(
-          config["DB_USER"],
-          config["DB_PASSWORD"],
-          config["DB_HOST"],
-          config["DB_NAME"]
-        );
-
-        let user = await models.user.findOne({
-          where: { User: config["DB_USER"] }
-        });
-        let result = await user.destroy();
-
-        if (!result) {
-          throw new Error("Delete User false", 1000);
-        }
-
-        let newconfig = await this.createUserDb(webnew);
-        let data = {
-          DB_USER: newconfig["User"],
-          DB_PASSWORD: newconfig["authentication_string"],
-          DB_NAME: `${newconfig["User"]}_db`
-        };
-
-        await this.editWpConfig(website, data);
-        await this.importDatabase(
-          data["DB_USER"],
-          data["DB_PASSWORD"],
-          data["DB_NAME"],
-          db["database"]
-        );
-        let webold = await models.sequelize.query(
-          `SELECT \`option_value\` FROM \`${data["DB_NAME"]}\`.\`${
-            config["PREFIX"]
-          }options\` WHERE \`option_name\` = 'siteurl'`,
-          { type: models.sequelize.QueryTypes.SELECT }
-        );
-        webold = webold[0].option_value;
-
-        let replace = await this.replaceUrl(
-          data["DB_NAME"],
-          config["PREFIX"],
-          webold,
-          `${firts}${webnew}`
-        );
-
-        if (replace.success === false) {
-          throw new Error("Replace url false", 1000);
-        }
-        this.moveDir();
-        let cmd = this.convertCommand(`mv ${website} ${webnew}`);
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
-        resolve(replace);
       } catch (e) {
         reject(e.message);
       }
@@ -184,36 +191,7 @@ export default class WordpressQuery extends Query {
 
   dump(res) {
     return new Promise(async (resolve, reject) => {
-      if (fs.existsSync("wp-config.php") === false) {
-        reject({
-          message: `wp-config.php not found`,
-          error_code: 204
-        });
-      }
-      let config = await this.readConfig("wp-config.php");
-      var sp = spawncmd(
-        "mysqldump",
-        [
-          "-u" + config["DB_USER"],
-          "-p" + config["DB_PASSWORD"],
-          "-h" + config["DB_HOST"],
-          config["DB_NAME"],
-          "--default-character-set=utf8",
-          "--comments"
-        ],
-        {
-          highWaterMark: 16 * 1024
-        }
-      );
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader("Content-disposition", `filename=${config["DB_NAME"]}.sql`);
-      sp.stdout.pipe(res);
-    });
-  }
-
-  importNewDb(website) {
-    return new Promise(async (resolve, reject) => {
-      try {
+      if (Boolean(process.env.MYSQL_ON) === true) {
         if (fs.existsSync("wp-config.php") === false) {
           reject({
             message: `wp-config.php not found`,
@@ -221,34 +199,80 @@ export default class WordpressQuery extends Query {
           });
         }
         let config = await this.readConfig("wp-config.php");
-        await this.backupDatabase(
-          config["DB_USER"],
-          config["DB_PASSWORD"],
-          config["DB_NAME"]
+        var sp = spawncmd(
+          "mysqldump",
+          [
+            "-u" + config["DB_USER"],
+            "-p" + config["DB_PASSWORD"],
+            "-h" + config["DB_HOST"],
+            config["DB_NAME"],
+            "--default-character-set=utf8",
+            "--comments"
+          ],
+          {
+            highWaterMark: 16 * 1024
+          }
         );
-        await this.resetDatabase(config["DB_NAME"]);
-        await this.importDatabase(
-          config["DB_USER"],
-          config["DB_PASSWORD"],
-          config["DB_NAME"],
-          "leannewvicoderscom_db.sql"
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader(
+          "Content-disposition",
+          `filename=${config["DB_NAME"]}.sql`
         );
+        sp.stdout.pipe(res);
+      } else {
+        reject({
+          message: "framework can not database",
+          error_code: 500
+        });
+      }
+    });
+  }
 
-        let webold = await models.sequelize.query(
-          `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
-            config["PREFIX"]
-          }options\` WHERE \`option_name\` = 'siteurl'`,
-          { type: models.sequelize.QueryTypes.SELECT }
-        );
-        webold = webold[0].option_value;
+  importNewDb(website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (Boolean(process.env.MYSQL_ON) === true) {
+          if (fs.existsSync("wp-config.php") === false) {
+            reject({
+              message: `wp-config.php not found`,
+              error_code: 204
+            });
+          }
+          let config = await this.readConfig("wp-config.php");
+          await this.backupDatabase(
+            config["DB_USER"],
+            config["DB_PASSWORD"],
+            config["DB_NAME"]
+          );
+          await this.resetDatabase(config["DB_NAME"]);
+          await this.importDatabase(
+            config["DB_USER"],
+            config["DB_PASSWORD"],
+            config["DB_NAME"],
+            "leannewvicoderscom_db.sql"
+          );
 
-        await this.replaceUrl(
-          config["DB_NAME"],
-          config["PREFIX"],
-          webold,
-          website
-        );
-        resolve({ message: true });
+          let webold = await models.sequelize.query(
+            `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
+              config["PREFIX"]
+            }options\` WHERE \`option_name\` = 'siteurl'`,
+            { type: models.sequelize.QueryTypes.SELECT }
+          );
+          webold = webold[0].option_value;
+
+          await this.replaceUrl(
+            config["DB_NAME"],
+            config["PREFIX"],
+            webold,
+            website
+          );
+          resolve({ message: true });
+        } else {
+          reject({
+            message: "framework can not database",
+            error_code: 500
+          });
+        }
       } catch (e) {
         if (!e.message) {
           reject(e);
