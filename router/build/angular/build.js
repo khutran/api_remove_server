@@ -88,8 +88,8 @@ async function pull(req, res) {
 
     await query.pull(domain, git, branch, key, secret);
     await queryN.buildInstall();
-    await queryN.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
+    // await queryN.runBuild();
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     if (process.env.MIGRATE_NODE === true) {
       await queryN.runMigrate();
     }
