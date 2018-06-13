@@ -26,9 +26,7 @@ export default class AngularQuery extends Query {
         );
 
         let cmd = this.convertCommand(`${command} install`);
-        await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
+        await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
         reject(e);
