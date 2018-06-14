@@ -9,6 +9,7 @@ import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
 import { Domain } from "domain";
 import archiver from "archiver";
+const spawncmd = require("child_process").spawn;
 
 var archive = archiver("zip", {
   zlib: { level: 9 } // Sets the compression level.
@@ -253,14 +254,17 @@ export class Query {
     });
   }
 
-  runCommand(command) {
+  runCommand(command, res) {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = await this.filterCommand(command);
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
+        let sp = spawncmd(cmd["cmd"], cmd["options"], {
+          highWaterMark: 16 * 1024
         });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader("Content-Disposition", "filename=test.txt");
+        sp.stdout.pipe(res);
       } catch (e) {
         reject(e);
       }

@@ -25,6 +25,7 @@ async function buildFirts(req, res) {
 
     let query = new LaravelQuery();
     query.moveDir(website);
+    await query.createKey();
     await query.runMigrate();
     await query.seedMigrate();
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);

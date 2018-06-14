@@ -26,6 +26,18 @@ export default class LaravelQuery extends Query {
     });
   }
 
+  createKey() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand("php artisan key:generate");
+        await spawn(cmd["cmd"], cmd["options"]);
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   resetMigrate(website) {
     return new Promise(async (resolve, reject) => {
       try {
