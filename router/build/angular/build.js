@@ -1,5 +1,5 @@
 import express from "express";
-import  AngularQuery from "../../../scripts/AngularQuery";
+import AngularQuery from "../../../scripts/AngularQuery";
 import Git from "../../../scripts/Git";
 import { asyncMiddleware } from "../../../midlewares/AsyncMiddleware";
 import { Exception } from "../../../app/Exceptions/Exception";
@@ -15,6 +15,27 @@ router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
 router.get("/", AuthMiddleware, asyncMiddleware(get));
 router.get("/download", asyncMiddleware(download));
 router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
+router.post("/runbuild", asyncMiddleware(runBuild));
+
+async function runBuild(req, res) {
+  try {
+    let website = req.body.website;
+    if (!website) {
+      throw new Error("website not empty");
+    }
+    let query = new AngularQuery();
+    query.moveDir(website);
+    await query.runBuild();
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    res.json({ data: { success: true } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function buildFirts(req, res) {
   try {
@@ -25,7 +46,11 @@ async function buildFirts(req, res) {
     let query = new AngularQuery();
     query.moveDir(website);
     await query.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    // await query.chown(
+    //   process.env.USER_PERMISSION,
+    //   process.env.GROUP_PERMISSON,
+    //   website
+    // );
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -87,12 +112,9 @@ async function pull(req, res) {
     query.moveDir(domain);
 
     await query.pull(domain, git, branch, key, secret);
-    await queryN.buildInstall();
-    await queryN.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
-    if (process.env.MIGRATE_NODE === true) {
-      await queryN.runMigrate();
-    }
+    // if (process.env.MIGRATE_NODE === true) {
+    //   await queryN.runMigrate();
+    // }
 
     res.json({ data: { success: true } });
   } catch (e) {

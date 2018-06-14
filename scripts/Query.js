@@ -502,10 +502,10 @@ export class Query {
     });
   }
 
-  restartPm2(website) {
+  restartForever(website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd = this.convertCommand(`pm2 restart ${website}`);
+        let cmd = this.convertCommand(`forever restart ${website}`);
         await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
