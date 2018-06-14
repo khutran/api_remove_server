@@ -93,9 +93,9 @@ export default class LaravelQuery extends Query {
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
-        _.mapKeys(env, (value, key) => {
-          return (env[key] = "");
-        });
+        // _.mapKeys(env, (value, key) => {
+        //   return (env[key] = "");
+        // });
         resolve(env);
       } catch (e) {
         reject(e);
