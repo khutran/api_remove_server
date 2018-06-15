@@ -254,17 +254,23 @@ export class Query {
     });
   }
 
-  runCommand(command, res) {
+  runCommand(command) {
     return new Promise(async (resolve, reject) => {
       try {
+        
         let cmd = await this.filterCommand(command);
-        let sp = spawncmd(cmd["cmd"], cmd["options"], {
-          highWaterMark: 16 * 1024
-        });
+        // const out = fs.openSync('./test.log', 'a');
+        // const err = fs.openSync('./test.log', 'a');
 
-        res.setHeader("Content-Type", "application/octet-stream");
-        res.setHeader("Content-Disposition", "filename=test.txt");
-        sp.stdout.pipe(res);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          detached: true,
+          capture : ["stdout", "stderr"]
+        });
+        resolve(sp.stdout);
+        // sp.unref();
+        // res.setHeader("Content-Type", "application/octet-stream");
+        // res.setHeader("Content-Disposition", "filename=test.txt");
+        // sp.stdout.pipe(res);
       } catch (e) {
         reject(e);
       }
