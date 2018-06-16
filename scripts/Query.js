@@ -254,19 +254,20 @@ export class Query {
     });
   }
 
-  runCommand(command) {
+  runCommand(command, res) {
     return new Promise(async (resolve, reject) => {
       try {
         
         let cmd = await this.filterCommand(command);
-        // const out = fs.openSync('./test.log', 'a');
+        const out = fs.openSync('./test.log', 'a');
         // const err = fs.openSync('./test.log', 'a');
 
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          detached: true,
-          capture : ["stdout", "stderr"]
+        let sp = spawncmd(cmd["cmd"], cmd["options"], {
+          detached: true, 
+          stdio : ['ignore', out]
         });
-        resolve(sp.stdout);
+        // sp.stdout.pipe(out);
+        // sp.stdout.pipe(res);
         // sp.unref();
         // res.setHeader("Content-Type", "application/octet-stream");
         // res.setHeader("Content-Disposition", "filename=test.txt");

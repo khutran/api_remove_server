@@ -44,7 +44,7 @@ export default class AngularQuery extends Query {
           });
         }
 
-        let cmd = this.convertCommand("ng build");
+        let cmd = this.convertCommand("ng build_vicoders");
         await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
