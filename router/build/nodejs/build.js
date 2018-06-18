@@ -26,7 +26,7 @@ async function runBuild(req, res) {
     let query = new NodejsQuery();
     query.moveDir(website);
     await query.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     await query.restartForever(website);
     res.json({ data: { success: true } });
   } catch (e) {
@@ -50,7 +50,7 @@ async function buildFirts(req, res) {
     await query.runMigrate();
     await query.seedMigrate();
     await query.runBuild();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

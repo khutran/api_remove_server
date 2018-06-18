@@ -43,7 +43,7 @@ export default class AngularQuery extends Query {
           }
         );
 
-        let cmd = this.convertCommand(`${command} install`);
+        let cmd = this.convertCommand(`${command} install`, {capture: ["stdout", "stderr"]});
         await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
@@ -75,7 +75,7 @@ export default class AngularQuery extends Query {
         }
 
         let cmd = this.convertCommand(`yarn ${command}`);
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {capture: ["stdout", "stderr"]});
         resolve({ success: true });
 
       } catch (e) {

@@ -17,7 +17,7 @@ async function runComposer(req, res) {
 
     let query = new NodejsQuery();
     query.moveDir(website);
-    let q = await query.buildInstall();
+    await query.buildInstall();
 
     res.json({ data: { success: true } });
   } catch (e) {

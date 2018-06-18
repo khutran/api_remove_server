@@ -6,6 +6,7 @@ import async from "async";
 const spawncmd = require("child_process").spawn;
 
 export default class NodejsQuery extends Query {
+
   buildInstall() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -25,7 +26,7 @@ export default class NodejsQuery extends Query {
           }
         );
         let cmd = this.convertCommand(`${command} install`);
-        await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"],{capture: ["stdout", "stderr"]});
         resolve({ success: true });
       } catch (e) {
         reject(e);
@@ -56,7 +57,7 @@ export default class NodejsQuery extends Query {
         }
 
         let cmd = this.convertCommand(`yarn ${command}`);
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
+        let sp = await spawn(cmd["cmd"], cmd["options"], {capture: ["stdout", "stderr"]});
         resolve({ success: true });
       } catch (e) {
         reject(e);
@@ -135,9 +136,9 @@ export default class NodejsQuery extends Query {
         let cmd = this.convertCommand("cp .env.example .env");
         let sp = await spawn(cmd["cmd"], cmd["options"]);
         let env = await this.readEnv(".env");
-        _.mapKeys(env, (value, key) => {
-          return (env[key] = "");
-        });
+        // _.mapKeys(env, (value, key) => {
+        //   return (env[key] = "");
+        // });
         resolve(env);
       } catch (e) {
         reject(e);
