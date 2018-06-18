@@ -49,11 +49,15 @@ export default class NodejsQuery extends Query {
           reject({ message: "project not script build", error_code: 204 });
         }
 
-        let cmd = this.convertCommand("yarn build");
-        let sp = await spawn(cmd["cmd"], cmd["options"], {
-          capture: ["stdout", "stderr"]
-        });
-        resolve({ stdout: sp.stdout, stderr: sp.stderr });
+        let command = "build_vicoders";
+
+        if (_.isNil(data.scripts.build_vicoders)) {
+          command = "build";
+        }
+
+        let cmd = this.convertCommand(`yarn ${command}`);
+        let sp = await spawn(cmd["cmd"], cmd["options"]);
+        resolve({ success: true });
       } catch (e) {
         reject(e);
       }

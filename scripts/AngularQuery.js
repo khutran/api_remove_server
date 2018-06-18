@@ -62,9 +62,22 @@ export default class AngularQuery extends Query {
           });
         }
 
-        let cmd = this.convertCommand("yarn build_vicoders");
-        await spawn(cmd["cmd"], cmd["options"]);
+        let data = JSON.parse(fs.readFileSync("package.json"));
+
+        if (_.isNil(data.scripts.build)) {
+          reject({ message: "project not script build", error_code: 204 });
+        }
+
+        let command = "build_vicoders";
+
+        if (_.isNil(data.scripts.build_vicoders)) {
+          command = "build";
+        }
+
+        let cmd = this.convertCommand(`yarn ${command}`);
+        let sp = await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
+
       } catch (e) {
         reject(e);
       }
