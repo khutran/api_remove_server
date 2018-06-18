@@ -8,6 +8,24 @@ import { Exception } from "../app/Exceptions/Exception";
 const spawncmd = require("child_process").spawn;
 
 export default class WordpressQuery extends Query {
+
+  addHtaccess() {
+    return new Promise((resolve, reject) => {
+      try {
+        if (fs.existsSync(".htaccess")) {
+          resolve({ success: true });
+        }
+
+        let content =
+          "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteBase /\nRewriteRule ^index.php$ - [L]\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule . /index.php [L]\n</IfModule>";
+        fs.writeFileSync(".htaccess", content, "utf8");
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   getConfig() {
     return new Promise(async (resolve, reject) => {
       try {

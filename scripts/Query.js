@@ -143,39 +143,46 @@ export class Query {
 
   readConfig(path) {
     return new Promise(async (resolve, reject) => {
-      let obj = {};
-      if (fs.existsSync(path) === false) {
-        reject({
-          message: `${path} not found`,
-          error_code: 204
-        });
-      }
+      try {
+        let obj = {};
+        if (fs.existsSync(path) === false) {
+          reject({
+            message: `${path} not found`,
+            error_code: 204
+          });
+        }
 
-      fs.readFile(path, (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        data = _.split(data, "\n");
-        data = _.remove(data, n => {
-          return !n.indexOf("define") || !n.indexOf("$table_prefix");
-        });
-        for (let i in data) {
-          if (data[i].indexOf("$table_prefix") > -1) {
-            data[i] = data[i].replace(/ /gi, "");
-            data[i] = data[i].replace(/'/gi, "");
-            data[i] = data[i].slice(1, -1);
-            data[i] = _.split(data[i], "=");
-            obj["PREFIX"] = data[i][1];
-          } else {
-            data[i] = data[i].replace(/ /gi, "");
-            data[i] = data[i].replace(/'/gi, "");
-            data[i] = data[i].slice(7, -2);
-            data[i] = _.split(data[i], ",");
-            obj[data[i][0]] = data[i][1];
+        fs.readFile(path, (err, data) => {
+          if (err) {
+            reject(err);
           }
-        }
-        resolve(obj);
-      });
+          data = _.split(data, "\n");
+          data = _.remove(data, n => {
+            return !n.indexOf("define") || !n.indexOf("$table_prefix");
+          });
+          for (let i in data) {
+            if (data[i].indexOf("$table_prefix") > -1) {
+              data[i] = data[i].replace(/ /gi, "");
+              data[i] = data[i].replace(/'/gi, "");
+              data[i] = data[i].slice(1, -1);
+              data[i] = _.split(data[i], "=");
+              obj["PREFIX"] = data[i][1];
+            } else {
+              if (data[i].indexOf("//") > -1) {
+                data[i] = data[i].slice(0, data[i].indexOf("//"));
+              }
+              data[i] = data[i].replace(/ /gi, "");
+              data[i] = data[i].replace(/'/gi, "");
+              data[i] = data[i].slice(7, -2);
+              data[i] = _.split(data[i], ",");
+              obj[data[i][0]] = data[i][1];
+            }
+          }
+          resolve(obj);
+        });
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 
@@ -257,17 +264,16 @@ export class Query {
   runCommand(command) {
     return new Promise(async (resolve, reject) => {
       try {
-        
         let cmd = await this.filterCommand(command);
         // const out = fs.openSync('./test.log', 'a');
         // const err = fs.openSync('./test.log', 'a');
 
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
-          // detached: true, 
+          // detached: true,
           // stdio : ['ignore', out]
         });
-        resolve(sp.stdout);
+        resolve(sp);
         // sp.stdout.pipe(out);
         // sp.stdout.pipe(res);
         // sp.unref();

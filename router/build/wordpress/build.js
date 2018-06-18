@@ -118,8 +118,10 @@ async function pull(req, res) {
     let secret = req.body.secret;
 
     let query = new Git();
+    let queryW = new WordpressQuery();
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
+    await queryW.addHtaccess();
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     res.json({ data: result });
   } catch (e) {

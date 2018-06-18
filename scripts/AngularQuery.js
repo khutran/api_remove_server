@@ -4,8 +4,26 @@ import { Query } from "./Query";
 import * as _ from "lodash";
 const spawncmd = require("child_process").spawn;
 import async from "async";
+import { resolve } from "dns";
 
 export default class AngularQuery extends Query {
+  addHtaccess() {
+    return new Promise((resolve, reject) => {
+      try {
+        if (fs.existsSync("./dist/.htaccess")) {
+          resolve({ success: true });
+        }
+
+        let content =
+          "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteBase /\nRewriteRule ^index.html$ - [L]\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule . /index.html [L]\n</IfModule>";
+        fs.writeFileSync("./dist/.htaccess", content, "utf8");
+        resolve({ success: true });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+  
   buildInstall() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -113,7 +131,7 @@ export default class AngularQuery extends Query {
             error_code: 204
           });
         }
-        
+
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
