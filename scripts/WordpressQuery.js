@@ -8,7 +8,6 @@ import { Exception } from "../app/Exceptions/Exception";
 const spawncmd = require("child_process").spawn;
 
 export default class WordpressQuery extends Query {
-
   addHtaccess() {
     return new Promise((resolve, reject) => {
       try {
@@ -21,6 +20,12 @@ export default class WordpressQuery extends Query {
         fs.writeFileSync(".htaccess", content, "utf8");
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -38,7 +43,13 @@ export default class WordpressQuery extends Query {
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
-        reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -52,7 +63,13 @@ export default class WordpressQuery extends Query {
         });
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -67,9 +84,6 @@ export default class WordpressQuery extends Query {
         ) {
           this.moveDir(website);
           let file = await this.readConfig("wp-config.php");
-          // for (let i in file) {
-          //   file[i] = "";
-          // }
           resolve(file);
         }
 
@@ -78,7 +92,9 @@ export default class WordpressQuery extends Query {
             process.env.PATH_WEB
           }/${website}/workspace/wp-config.php`
         );
-        await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         this.moveDir(website);
         let file = await this.readConfig("wp-config.php");
         // for (let i in file) {
@@ -86,7 +102,13 @@ export default class WordpressQuery extends Query {
         // }
         resolve(file);
       } catch (e) {
-        reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -122,7 +144,13 @@ export default class WordpressQuery extends Query {
           resolve(true);
         });
       } catch (e) {
-        reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -202,7 +230,13 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }

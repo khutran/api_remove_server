@@ -19,11 +19,17 @@ export default class AngularQuery extends Query {
         fs.writeFileSync("./dist/.htaccess", content, "utf8");
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
   }
-  
+
   buildInstall() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -43,10 +49,18 @@ export default class AngularQuery extends Query {
           }
         );
 
-        let cmd = this.convertCommand(`${command} install`, {capture: ["stdout", "stderr"]});
+        let cmd = this.convertCommand(`${command} install`, {
+          capture: ["stdout", "stderr"]
+        });
         await spawn(cmd["cmd"], cmd["options"]);
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -75,10 +89,17 @@ export default class AngularQuery extends Query {
         }
 
         let cmd = this.convertCommand(`yarn ${command}`);
-        let sp = await spawn(cmd["cmd"], cmd["options"], {capture: ["stdout", "stderr"]});
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
-
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -94,13 +115,21 @@ export default class AngularQuery extends Query {
           });
         }
         let cmd = this.convertCommand("cp .env.example .env");
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
-        let env = await this.readEnv(".env");
-        _.mapKeys(env, (value, key) => {
-          return (env[key] = "");
+        let sp = await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
         });
+        let env = await this.readEnv(".env");
+        // _.mapKeys(env, (value, key) => {
+        //   return (env[key] = "");
+        // });
         resolve(env);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -127,9 +156,15 @@ export default class AngularQuery extends Query {
             throw new Error(err, 500);
           }
 
-          resolve(true);
+          resolve({ success: true });
         });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });

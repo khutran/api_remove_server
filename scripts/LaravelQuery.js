@@ -21,6 +21,12 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -30,9 +36,17 @@ export default class LaravelQuery extends Query {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand("php artisan key:generate");
-        await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -54,6 +68,12 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -75,6 +95,12 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -91,13 +117,21 @@ export default class LaravelQuery extends Query {
         }
 
         let cmd = this.convertCommand("cp .env.example .env");
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         let env = await this.readEnv(".env");
         // _.mapKeys(env, (value, key) => {
         //   return (env[key] = "");
         // });
         resolve(env);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -127,6 +161,12 @@ export default class LaravelQuery extends Query {
           resolve(true);
         });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -144,14 +184,11 @@ export default class LaravelQuery extends Query {
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
-        if (e.message === "ENOENT: no such file or directory, uv_chdir") {
-          e.message = "website not build";
-          e.error_code = 204;
-        } else if (
-          e.message === "ENOENT: no such file or directory, open '.env'"
-        ) {
-          e.message = "website not config";
-          e.error_code = 104;
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
         }
         reject(e);
       }
@@ -166,6 +203,12 @@ export default class LaravelQuery extends Query {
         });
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -203,10 +246,13 @@ export default class LaravelQuery extends Query {
         );
         sp.stdout.pipe(res);
       } else {
-        reject({
-          message: "framework can not database",
-          error_code: 500
-        });
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }

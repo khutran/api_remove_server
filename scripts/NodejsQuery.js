@@ -6,7 +6,6 @@ import async from "async";
 const spawncmd = require("child_process").spawn;
 
 export default class NodejsQuery extends Query {
-
   buildInstall() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -26,9 +25,17 @@ export default class NodejsQuery extends Query {
           }
         );
         let cmd = this.convertCommand(`${command} install`);
-        await spawn(cmd["cmd"], cmd["options"],{capture: ["stdout", "stderr"]});
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -57,9 +64,17 @@ export default class NodejsQuery extends Query {
         }
 
         let cmd = this.convertCommand(`yarn ${command}`);
-        let sp = await spawn(cmd["cmd"], cmd["options"], {capture: ["stdout", "stderr"]});
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -89,6 +104,12 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -118,6 +139,12 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -134,13 +161,21 @@ export default class NodejsQuery extends Query {
         }
 
         let cmd = this.convertCommand("cp .env.example .env");
-        let sp = await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         let env = await this.readEnv(".env");
         // _.mapKeys(env, (value, key) => {
         //   return (env[key] = "");
         // });
         resolve(env);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -170,6 +205,10 @@ export default class NodejsQuery extends Query {
           resolve(true);
         });
       } catch (e) {
+        reject({
+          message: "framework can not database",
+          error_code: 500
+        });
         reject(e);
       }
     });

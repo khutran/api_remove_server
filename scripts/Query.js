@@ -58,11 +58,19 @@ export class Query {
         }
 
         if (cmd["cmd"]) {
-          await spawn(cmd["cmd"], cmd["options"]);
+          await spawn(cmd["cmd"], cmd["options"], {
+            capture: ["stdout", "stderr"]
+          });
         }
 
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -85,6 +93,12 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -181,6 +195,12 @@ export class Query {
           resolve(obj);
         });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -198,6 +218,12 @@ export class Query {
         }
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -219,6 +245,12 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -256,6 +288,12 @@ export class Query {
 
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -265,22 +303,18 @@ export class Query {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = await this.filterCommand(command);
-        // const out = fs.openSync('./test.log', 'a');
-        // const err = fs.openSync('./test.log', 'a');
-
         let sp = await spawn(cmd["cmd"], cmd["options"], {
           capture: ["stdout", "stderr"]
-          // detached: true,
-          // stdio : ['ignore', out]
         });
+
         resolve(sp);
-        // sp.stdout.pipe(out);
-        // sp.stdout.pipe(res);
-        // sp.unref();
-        // res.setHeader("Content-Type", "application/octet-stream");
-        // res.setHeader("Content-Disposition", "filename=test.txt");
-        // sp.stdout.pipe(res);
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -315,9 +349,15 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.message === "Validation error") {
-          return (e.message = "Db or user exits");
+        if (e.stdout !== '') {
+          e.message = e.stdout;
         }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        // if (e.message === "Validation error") {
+        //   return (e.message = "Db or user exits");
+        // }
         reject(e);
       }
     });
@@ -339,7 +379,13 @@ export class Query {
           });
         }
       } catch (e) {
-        reject({ success: false, database: "" });
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -359,7 +405,13 @@ export class Query {
           });
         }
       } catch (e) {
-        reject({ success: false, database: "" });
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -378,7 +430,13 @@ export class Query {
           });
         }
       } catch (e) {
-        reject({ success: false });
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -397,6 +455,12 @@ export class Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -417,6 +481,12 @@ export class Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -438,6 +508,12 @@ export class Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -476,7 +552,13 @@ export class Query {
           });
         }
       } catch (e) {
-        reject({ suscess: false });
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
@@ -499,6 +581,12 @@ export class Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -516,6 +604,12 @@ export class Query {
           reject({ message: "Domain not create", success: "false" });
         }
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -525,9 +619,17 @@ export class Query {
     return new Promise(async (resolve, reject) => {
       try {
         let cmd = this.convertCommand(`forever restart ${website}`);
-        await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
@@ -539,9 +641,17 @@ export class Query {
         const cmd = this.convertCommand(
           `rm -rf ${process.env.PATH_WEB}/${website}`
         );
-        await spawn(cmd["cmd"], cmd["options"]);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
         resolve({ success: true });
       } catch (e) {
+        if (e.stdout !== '') {
+          e.message = e.stdout;
+        }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });
