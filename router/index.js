@@ -1,11 +1,14 @@
 import express from "express";
-import AuthMiddleware from '../midlewares/AuthMiddleware';
-import buildApi from "./build";
-import getApi from "./get";
+import wordpress from "./wordpress";
+import laravel from "./laravel";
+import nodejs from "./nodejs";
+import angular from "./angular";
+
 let router = express.Router();
 
-// router.all('*', AuthMiddleware);
-router.use("/build", buildApi);
-router.use("/get", getApi);
+router.use("/wordpress", wordpress);
+router.use("/laravel", laravel);
+router.use("/nodejs", nodejs);
+router.use("/angular4", angular);
 
 export default router;
