@@ -14,7 +14,7 @@ router.post("/build", hasPermission.bind(Permission.USER_CREATE), asyncMiddlewar
 router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(create));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
 router.post("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
-router.post("/replace", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(replace));
+router.post("/replace", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(replace));
 
 async function replace(req, res) {
   try {
