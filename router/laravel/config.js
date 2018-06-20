@@ -6,10 +6,10 @@ import AuthMiddleware from "../../midlewares/AuthMiddleware";
 
 let router = express.Router();
 
-router.post("/", AuthMiddleware, asyncMiddleware(create));
-router.put("/", AuthMiddleware, asyncMiddleware(edit));
-router.put("/add_new", AuthMiddleware, asyncMiddleware(add));
-router.get("/", AuthMiddleware, asyncMiddleware(get));
+router.post("/",  asyncMiddleware(create));
+router.put("/",  asyncMiddleware(edit));
+router.put("/add_new", asyncMiddleware(add));
+router.get("/", asyncMiddleware(get));
 
 async function get(req, res) {
   try {
