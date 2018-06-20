@@ -10,14 +10,14 @@ import Permission from '../../app/Config/AvailablePermissions';
 let router = express.Router();
 
 router.all('*', AuthMiddleware);
-router.post("/build", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(build));
+router.post("/build", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(build));
 router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(create));
-router.post("/reset", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(reset));
-router.post("/seed", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(seed));
+router.post("/reset", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(reset));
+router.post("/seed", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(seed));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
-router.post("/import", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(importDb));
-router.get("/download", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(download));
+router.post("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
 router.post("/replace", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(replace));
+
 async function replace(req, res) {
   try {
     res.json({ data: { suscess: true } });

@@ -7,6 +7,7 @@ import ApiConfig from './config';
 import ApiBuild from './build';
 import ApiInfo from './info';
 import ApiDownload from './download';
+import ApiServer from './server';
 
 let router = express.Router();
 
@@ -17,5 +18,6 @@ router.use('/config', ApiConfig);
 router.use('/build', ApiBuild);
 router.use('/info', ApiInfo);
 router.use('/download', ApiDownload);
+router.use('/server', ApiServer);
 
 export default router;
