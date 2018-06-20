@@ -4,18 +4,20 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
 
-router.post("/build", AuthMiddleware, asyncMiddleware(build));
-router.post("/create", AuthMiddleware, asyncMiddleware(create));
-router.post("/reset", AuthMiddleware, asyncMiddleware(reset));
-router.post("/seed", AuthMiddleware, asyncMiddleware(seed));
-router.delete("/", AuthMiddleware, asyncMiddleware(deleteDb));
-router.post("/import", AuthMiddleware, asyncMiddleware(importDb));
-router.get("/download", asyncMiddleware(download));
-router.post("/replace", AuthMiddleware, asyncMiddleware(replace));
-
+router.all('*', AuthMiddleware);
+router.post("/build", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(build));
+router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(create));
+router.post("/reset", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(reset));
+router.post("/seed", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(seed));
+router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
+router.post("/import", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(importDb));
+router.get("/download", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(download));
+router.post("/replace", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(replace));
 async function replace(req, res) {
   try {
     res.json({ data: { suscess: true } });

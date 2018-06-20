@@ -3,11 +3,14 @@ import WordpressQuery from "../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
 
-router.put("/", asyncMiddleware(rename));
-router.post("/", asyncMiddleware(create));
+router.all('*', AuthMiddleware);
+router.put("/", hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(rename));
+router.post("/", hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(create));
 
 async function create(req, res) {
   try {

@@ -6,16 +6,18 @@ import { Exception } from "../../app/Exceptions/Exception";
 import Error from "../../app/Exceptions/GetError";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
 
-router.post("/clone", AuthMiddleware, asyncMiddleware(clone));
-router.post("/pull", asyncMiddleware(pull));
-router.delete("/", AuthMiddleware, asyncMiddleware(deleteP));
-router.get("/", AuthMiddleware, asyncMiddleware(get));
-router.get("/download", asyncMiddleware(download));
-router.post("/buildfirts", AuthMiddleware, asyncMiddleware(buildFirts));
-router.post("/runbuild", asyncMiddleware(runBuild));
+router.all('*', AuthMiddleware);
+router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
+router.post("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
+router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
+router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
+router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));
+router.post("/runbuild", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(runBuild));
 
 async function runBuild(req, res) {
   try {
@@ -60,12 +62,6 @@ async function buildFirts(req, res) {
       throw new Exception(e.message, 500);
     }
   }
-}
-
-async function download(req, res) {
-  let website = req.query.website;
-  let query = new AngularQuery();
-  await query.compressed(website, res);
 }
 
 async function get(req, res) {

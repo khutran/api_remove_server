@@ -23,23 +23,14 @@ const auth = asyncMiddleware(async (req, res, next) => {
     if (!decoded) {
       throw new Error('Token invalid', 304);
     }
-    let bool = false;
 
     if (!decoded.data.roles) {
       res.status(500);
       res.json({ message: 'Permission denied', error_code: 203 });
     }
-    _.forEach(decoded.data.roles, item => {
-      if (item.id === 1) {
-        bool = true;
-      }
-    });
-  
-    if (bool === true) {
-      next();
-    } else {
-      throw new Error('Permission defined', 203);
-    }
+
+    req.me = decoded.data.roles;
+    next();
   } catch (e) {
     throw new Exception(e.message, 304);
   }

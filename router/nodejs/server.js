@@ -3,11 +3,15 @@ import NodejsQuery from "../../scripts/NodejsQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
+
 const fs = require("fs");
 
 let router = express.Router();
 
-router.get("/", asyncMiddleware(get));
+router.all('*', AuthMiddleware);
+router.get("/", hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(get));
 
 async function get(req, res) {
   try {

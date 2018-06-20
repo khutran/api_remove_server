@@ -4,9 +4,13 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
-router.get("/", asyncMiddleware(inFo));
+
+router.all('*', AuthMiddleware);
+router.get("/", hasPermission.bind(Permission.USER_VIEW) , asyncMiddleware(inFo));
 
 async function inFo(req, res) {
   try {

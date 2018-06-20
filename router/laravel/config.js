@@ -3,13 +3,16 @@ import LaravelQuery from "../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
 
-router.post("/",  asyncMiddleware(create));
-router.put("/",  asyncMiddleware(edit));
-router.put("/add_new", asyncMiddleware(add));
-router.get("/", asyncMiddleware(get));
+router.all('*', AuthMiddleware);
+router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(create));
+router.put("/", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(edit));
+router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
+router.put("/add_new", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(add));
 
 async function get(req, res) {
   try {

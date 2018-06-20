@@ -4,11 +4,14 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
+import hasPermission from "../../midlewares/PermissionMiddleware";
+import Permission from '../../app/Config/AvailablePermissions';
 import fs from "fs";
 
 let router = express.Router();
 
-router.post("/", asyncMiddleware(runComposer));
+router.all('*', AuthMiddleware);
+router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(runComposer));
 
 async function runComposer(req, res) {
   try {
