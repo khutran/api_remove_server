@@ -5,15 +5,30 @@ import { Exception } from '../../app/Exceptions/Exception';
 import AuthMiddleware from '../../midlewares/AuthMiddleware';
 import hasPermission from '../../midlewares/PermissionMiddleware';
 import Permission from '../../app/Config/AvailablePermissions';
-
+import * as _ from "lodash";
 const fs = require('fs');
 
 let router = express.Router();
 
 router.all('*', AuthMiddleware);
+router.get('/info', hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(info));
 router.get('/', hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(getAll));
 router.get('/:uid', hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(getByUid));
 router.post('/', hasPermission.bind(Permission.ADMIN_VIEW), asyncMiddleware(create));
+
+async function info(req, res) {
+  try {
+    let query = new NodejsQuery();
+    let info = await query.info();
+    res.json({ data: info });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function create(req, res) {
   try {
@@ -24,7 +39,11 @@ async function create(req, res) {
       script: req.body.script,
       sourceDir: `${process.env.PATH_WEB}/${req.body.website}/workspace`
     }
-
+    let str = JSON.stringify(data);
+    str = str.replace(/,/gi, ',\n');
+    str = str.replace(/{/gi, '{\n');
+    str = str.replace(/}/gi, '\n}');
+    fs.writeFileSync(`${process.env.PATH_WEB}/ecosystem/${req.body.website}.json`, str, "utf8");
     res.json({ data : data });
   } catch (e) {
     if (e.error_code) {

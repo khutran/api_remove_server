@@ -16,6 +16,75 @@ var archive = archiver("zip", {
 });
 
 export class Query {
+  info() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let info = {
+          use_ram: {}
+        };
+        const df = await spawn("df", [], { capture: ["stdout"] });
+        const use_disk = await spawn("awk", ["{print $5}"], {
+          capture: ["stdout", "stderr"]
+        }).progress(childProcess => {
+          childProcess.stdin.write(df.stdout);
+          childProcess.stdin.end();
+        });
+        let d = _.split(use_disk.stdout, "\n");
+        info["disk_use"] = d[1];
+
+        const free = await spawn("free", ["-m"], { capture: ["stdout"] });
+        const grep = await spawn("grep", [":"], {
+          capture: ["stdout"]
+        }).progress(childProcess => {
+          childProcess.stdin.write(free.stdout);
+          childProcess.stdin.end();
+        });
+        const use_ram = await spawn(
+          "awk",
+          [
+            '{print $1,"|total:"$2,"|used:"$3,"|free:"$4,"|shared:"$5,"|cache:"$6,"|available:"$7"-"}'
+          ],
+          {
+            capture: ["stdout"]
+          }
+        ).progress(childProcess => {
+          childProcess.stdin.write(grep.stdout);
+          childProcess.stdin.end();
+        });
+        let r = _
+          .split(use_ram.stdout, "-")
+          .filter(item => {
+            return item !== "\n";
+          })
+          .map(item => {
+            item = _.split(item, "|");
+            let name = item[0].replace("\n", "");
+            item = _.slice(item, 1, item.length);
+            info.use_ram[name] = item;
+          });
+
+        const uptime = await spawn("uptime", [], { capture: ["stdout"] });
+        const load = await spawn("awk", ['{print $10}'], {
+          capture: ["stdout"]
+        }).progress(childProcess => {
+          childProcess.stdin.write(uptime.stdout);
+          childProcess.stdin.end();
+        });
+        info['load'] = load.stdout.replace(/\n/gi, '');
+
+        resolve(info);
+      } catch (e) {
+        if (e.stdout !== "") {
+          e.message = e.stdout;
+        }
+        if (e.stderr !== "") {
+          e.message = e.stderr;
+        }
+        reject(e);
+      }
+    });
+  }
+
   moveDir(website = null, link = "") {
     try {
       let path;
@@ -65,10 +134,10 @@ export class Query {
 
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -93,10 +162,10 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -195,10 +264,10 @@ export class Query {
           resolve(obj);
         });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -218,10 +287,10 @@ export class Query {
         }
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -245,10 +314,10 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -288,10 +357,10 @@ export class Query {
 
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -309,10 +378,10 @@ export class Query {
 
         resolve(sp);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -349,10 +418,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         // if (e.message === "Validation error") {
@@ -379,10 +448,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -405,10 +474,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -430,10 +499,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -455,10 +524,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -481,10 +550,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -508,10 +577,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -552,10 +621,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -581,10 +650,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -604,10 +673,10 @@ export class Query {
           reject({ message: "Domain not create", success: "false" });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -624,10 +693,10 @@ export class Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -646,10 +715,10 @@ export class Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
