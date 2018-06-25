@@ -550,12 +550,6 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
-          e.message = e.stdout;
-        }
-        if (e.stderr !== "") {
-          e.message = e.stderr;
-        }
         reject(e);
       }
     });
