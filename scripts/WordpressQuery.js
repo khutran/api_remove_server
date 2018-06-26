@@ -311,20 +311,20 @@ export default class WordpressQuery extends Query {
             // file[file.length - 1].slice(11)
           // );
           
-          let webold = await models.sequelize.query(
-            `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
-              config["PREFIX"]
-            }options\` WHERE \`option_name\` = 'siteurl'`,
-            { type: models.sequelize.QueryTypes.SELECT }
-          );
-          webold = webold[0].option_value;
+          // let webold = await models.sequelize.query(
+          //   `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
+          //     config["PREFIX"]
+          //   }options\` WHERE \`option_name\` = 'siteurl'`,
+          //   { type: models.sequelize.QueryTypes.SELECT }
+          // );
+          // webold = webold[0].option_value;
 
-          await this.replaceUrl(
-            config["DB_NAME"],
-            config["PREFIX"],
-            webold,
-            website
-          );
+          // await this.replaceUrl(
+          //   config["DB_NAME"],
+          //   config["PREFIX"],
+          //   webold,
+          //   website
+          // );
 
           resolve({ message: true });
         } else {
