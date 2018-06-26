@@ -52,7 +52,7 @@ async function importDb(req, res) {
     query.moveDir(website);
     let q = await query.importNewDb(website);
 
-    res.json({ data: q });
+    res.json({ data: {suscess : true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);

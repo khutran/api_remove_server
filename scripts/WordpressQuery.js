@@ -302,11 +302,11 @@ export default class WordpressQuery extends Query {
           file = _.remove(file, function(n) {
             return n.indexOf("database");
           });
-
           await this.importDatabase(
             config["DB_USER"],
             config["DB_PASSWORD"],
             config["DB_NAME"],
+            config["DB_HOST"],
             file[file.length - 1].slice(11)
           );
 
