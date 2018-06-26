@@ -64,13 +64,13 @@ export class Query {
           });
 
         const uptime = await spawn("uptime", [], { capture: ["stdout"] });
-        const load = await spawn("awk", ['{print $10}'], {
+        const load = await spawn("awk", ["{print $10}"], {
           capture: ["stdout"]
         }).progress(childProcess => {
           childProcess.stdin.write(uptime.stdout);
           childProcess.stdin.end();
         });
-        info['load'] = load.stdout.replace(/\n/gi, '');
+        info["load"] = load.stdout.replace(/\n/gi, "");
 
         resolve(info);
       } catch (e) {
@@ -550,6 +550,12 @@ export class Query {
           });
         }
       } catch (e) {
+        if (e.stdout !== "") {
+          e.message = e.stdout;
+        }
+        if (e.stderr !== "") {
+          e.message = e.stderr;
+        }
         reject(e);
       }
     });

@@ -119,7 +119,7 @@ async function pull(req, res) {
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
     await queryW.addHtaccess();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
+    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

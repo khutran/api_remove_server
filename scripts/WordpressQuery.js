@@ -332,11 +332,13 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        if (!e.message) {
-          reject(e);
-        } else {
-          reject(e.message);
+        if (e.stdout !== '') {
+          e.message = e.stdout;
         }
+        if(e.stderr !== '') {
+          e.message = e.stderr;
+        }
+        reject(e);
       }
     });
   }
