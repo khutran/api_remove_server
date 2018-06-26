@@ -298,19 +298,18 @@ export default class WordpressQuery extends Query {
           // );
           await this.resetDatabase(config["DB_NAME"]);
 
-          // let file = await query.findFile("*.sql");
-          // file = _.remove(file, function(n) {
-          //   return n.indexOf("database");
-          // });
-          // console.log(file);
-          await this.importDatabase(
-            config["DB_USER"],
-            config["DB_PASSWORD"],
-            config["DB_NAME"],
-            config["DB_HOST"],
-            'bravia.sql'
+          let file = await query.findFile("*.sql");
+          file = _.remove(file, function(n) {
+            return n.indexOf("database");
+          });
+          console.log(file);
+          // await this.importDatabase(
+          //   config["DB_USER"],
+          //   config["DB_PASSWORD"],
+          //   config["DB_NAME"],
+          //   config["DB_HOST"],
             // file[file.length - 1].slice(11)
-          );
+          // );
           
           let webold = await models.sequelize.query(
             `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
