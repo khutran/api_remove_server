@@ -291,11 +291,11 @@ export default class WordpressQuery extends Query {
             });
           }
           let config = await this.readConfig("wp-config.php");
-          await this.backupDatabase(
-            config["DB_USER"],
-            config["DB_PASSWORD"],
-            config["DB_NAME"]
-          );
+          // await this.backupDatabase(
+          //   config["DB_USER"],
+          //   config["DB_PASSWORD"],
+          //   config["DB_NAME"]
+          // );
           await this.resetDatabase(config["DB_NAME"]);
 
           let file = await query.findFile("*.sql");
