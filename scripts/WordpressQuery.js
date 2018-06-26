@@ -296,7 +296,7 @@ export default class WordpressQuery extends Query {
           //   config["DB_PASSWORD"],
           //   config["DB_NAME"]
           // );
-          await this.resetDatabase(config["DB_NAME"]);
+          // await this.resetDatabase(config["DB_NAME"]);
 
           let file = await query.findFile("*.sql");
           file = _.remove(file, function(n) {
