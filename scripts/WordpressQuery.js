@@ -20,10 +20,10 @@ export default class WordpressQuery extends Query {
         fs.writeFileSync(".htaccess", content, "utf8");
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -43,10 +43,10 @@ export default class WordpressQuery extends Query {
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -63,10 +63,10 @@ export default class WordpressQuery extends Query {
         });
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -102,10 +102,10 @@ export default class WordpressQuery extends Query {
         // }
         resolve(file);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -144,10 +144,10 @@ export default class WordpressQuery extends Query {
           resolve(true);
         });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -230,10 +230,10 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -291,11 +291,14 @@ export default class WordpressQuery extends Query {
             });
           }
           let config = await this.readConfig("wp-config.php");
-          // await this.backupDatabase(
-          //   config["DB_USER"],
-          //   config["DB_PASSWORD"],
-          //   config["DB_NAME"]
-          // );
+
+          await this.backupDatabase(
+            config["DB_USER"],
+            config["DB_PASSWORD"],
+            config["DB_HOST"],
+            config["DB_NAME"]
+          );
+
           await this.resetDatabase(config["DB_NAME"]);
 
           let file = await this.findFile("*.sql");
@@ -310,7 +313,7 @@ export default class WordpressQuery extends Query {
             config["DB_HOST"],
             file[file.length - 1].slice(11)
           );
-          
+
           let webold = await models.sequelize.query(
             `SELECT \`option_value\` FROM \`${config["DB_NAME"]}\`.\`${
               config["PREFIX"]
@@ -334,10 +337,10 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);

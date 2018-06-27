@@ -464,7 +464,7 @@ export class Query {
       try {
         if (Boolean(process.env.MYSQL_ON) === true) {
           let ex = await exec(
-            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > /var/www/backupdatabase/${dbname}.sql`
+            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > ${process.env.PATH_WEB}/${dbname}.sql`
           );
           resolve({ success: true, database: `${dbname}.sql` });
         } else {
