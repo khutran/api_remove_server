@@ -270,7 +270,14 @@ export default class WordpressQuery extends Query {
           "Content-disposition",
           `filename=${config["DB_NAME"]}.sql`
         );
-        sp.stdout.pipe(res);
+        sp.stdout
+          .pipe(res)
+          .on("finish", function() {
+            resolve();
+          })
+          .on("error", function(err) {
+            reject(err);
+          });
       } else {
         reject({
           message: "framework can not database",

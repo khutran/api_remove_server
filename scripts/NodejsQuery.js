@@ -30,10 +30,10 @@ export default class NodejsQuery extends Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -69,10 +69,10 @@ export default class NodejsQuery extends Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -104,10 +104,10 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -139,10 +139,10 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -170,10 +170,10 @@ export default class NodejsQuery extends Query {
         // });
         resolve(env);
       } catch (e) {
-        if (e.stdout !== '') {
+        if (e.stdout !== "") {
           e.message = e.stdout;
         }
-        if(e.stderr !== '') {
+        if (e.stderr !== "") {
           e.message = e.stderr;
         }
         reject(e);
@@ -244,7 +244,14 @@ export default class NodejsQuery extends Query {
           "Content-disposition",
           `filename=${config["DB_NAME"]}.sql`
         );
-        sp.stdout.pipe(res);
+        sp.stdout
+          .pipe(res)
+          .on("finish", function() {
+            resolve();
+          })
+          .on("error", function(err) {
+            reject(err);
+          });
       } else {
         reject({
           message: "framework can not database",
