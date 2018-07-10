@@ -5,11 +5,11 @@ require("dotenv").config();
 const spawn = require("child-process-promise").spawn;
 var exec = require("child-process-promise").exec;
 import Error from "../app/Exceptions/GetError";
-import { Exception } from "../app/Exceptions/Exception";
 import randomstring from "randomstring";
-import { Domain } from "domain";
 import archiver from "archiver";
-const spawncmd = require("child_process").spawn;
+import userid from "userid";
+const util = require("util");
+const mkdirp = util.promisify(require("mkdirp"));
 
 var archive = archiver("zip", {
   zlib: { level: 9 } // Sets the compression level.
@@ -74,10 +74,10 @@ export class Query {
 
         resolve(info);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -119,25 +119,25 @@ export class Query {
   chown(user, group, website) {
     return new Promise(async (resolve, reject) => {
       try {
-        let cmd;
         if (process.env.PATH_WEB) {
-          cmd = this.convertCommand(
-            `chown -R ${user}:${group} ${process.env.PATH_WEB}/${website}`
+          const uid = userid.uid(user);
+          const gid = userid.gid(group);
+          fs.chown(
+            `${process.env.PATH_WEB}/${website}/workspace`,
+            uid,
+            gid,
+            err => {
+              if (!err) {
+                resolve({ success: true });
+              }
+            }
           );
         }
-
-        if (cmd["cmd"]) {
-          await spawn(cmd["cmd"], cmd["options"], {
-            capture: ["stdout", "stderr"]
-          });
-        }
-
-        resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -162,10 +162,10 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -264,10 +264,10 @@ export class Query {
           resolve(obj);
         });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -287,10 +287,10 @@ export class Query {
         }
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -314,10 +314,10 @@ export class Query {
         });
         resolve(list);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -357,10 +357,10 @@ export class Query {
 
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -378,10 +378,10 @@ export class Query {
 
         resolve(sp);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -418,10 +418,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         // if (e.message === "Validation error") {
@@ -448,10 +448,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -464,7 +464,9 @@ export class Query {
       try {
         if (Boolean(process.env.MYSQL_ON) === true) {
           let ex = await exec(
-            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > ${process.env.PATH_WEB}/${dbname}.sql`
+            `mysqldump -u ${user} -p${password} ${dbname} -h ${host} > ${
+              process.env.PATH_WEB
+            }/${dbname}.sql`
           );
           resolve({ success: true, database: `${dbname}.sql` });
         } else {
@@ -474,10 +476,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -499,10 +501,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -524,10 +526,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -550,10 +552,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -577,10 +579,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -621,10 +623,10 @@ export class Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -638,22 +640,17 @@ export class Query {
         if (fs.existsSync(`${process.env.PATH_WEB}/${name}/workspace`)) {
           throw new Error("website exits", 208);
         } else {
-          let cmd = this.convertCommand(
-            `mkdir -p ${process.env.PATH_WEB}/${name}/workspace`
-          );
-          await spawn(cmd["cmd"], cmd["options"], {
-            capture: ["stdout", "stderr"]
-          });
+          const result = await mkdirp(`${process.env.PATH_WEB}/${name}/workspace`, [0o755]);
           resolve({
-            path: `${process.env.PATH_WEB}/${name}/workspace`,
+            path: `${result}/workspace`,
             success: true
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -673,10 +670,10 @@ export class Query {
           reject({ message: "Domain not create", success: "false" });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -693,10 +690,10 @@ export class Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -715,10 +712,10 @@ export class Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);

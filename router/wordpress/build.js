@@ -29,7 +29,9 @@ async function buildFirts(req, res) {
     }
 
     let query = new WordpressQuery();
+    
     query.moveDir(website);
+    await query.addHtaccess();
     let config = await query.readConfig("wp-config.php");
     let file = await query.findFile("*.sql");
     file = _.remove(file, function(n) {
@@ -43,6 +45,7 @@ async function buildFirts(req, res) {
       config["DB_HOST"],
       file[file.length - 1].slice(11)
     );
+    
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
     res.json({ data: { suscess: true } });
   } catch (e) {
@@ -119,7 +122,7 @@ async function pull(req, res) {
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
     await queryW.addHtaccess();
-    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
+    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

@@ -21,10 +21,10 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -41,10 +41,10 @@ export default class LaravelQuery extends Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -52,7 +52,7 @@ export default class LaravelQuery extends Query {
     });
   }
 
-  resetMigrate(website) {
+  resetMigrate() {
     return new Promise(async (resolve, reject) => {
       try {
         if (Boolean(process.env.MYSQL_ON) === true) {
@@ -68,10 +68,10 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -95,10 +95,10 @@ export default class LaravelQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -126,10 +126,38 @@ export default class LaravelQuery extends Query {
         // });
         resolve(env);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
+          e.message = e.stderr;
+        }
+        reject(e);
+      }
+    });
+  }
+
+  resetEnv() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (fs.existsSync("artisan") === false) {
+          reject({
+            message: "project not artisan",
+            error_code: 204
+          });
+        }
+
+        const cmd = this.convertCommand("php artisan config:clear");
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+
+        resolve(true);
+      } catch (e) {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
+          e.message = e.stdout;
+        }
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -161,10 +189,10 @@ export default class LaravelQuery extends Query {
           resolve(true);
         });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -184,10 +212,10 @@ export default class LaravelQuery extends Query {
         let config = await this.readEnv(".env");
         resolve(config);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -203,10 +231,10 @@ export default class LaravelQuery extends Query {
         });
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);

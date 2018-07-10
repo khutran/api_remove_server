@@ -1,10 +1,10 @@
 const spawn = require("child-process-promise").spawn;
 import { Query } from "./Query";
-import * as _ from "lodash";
-import fs from "fs";
-var exec = require("child-process-promise").exec;
-import { Exception } from "../app/Exceptions/Exception";
-const spawncmd = require("child_process").spawn;
+// import * as _ from "lodash";
+// import fs from "fs";
+// var exec = require("child-process-promise").exec;
+// import { Exception } from "../app/Exceptions/Exception";
+// const spawncmd = require("child_process").spawn;
 
 export default class Git extends Query {
   clone(domain, git, branch, key, secret) {
@@ -41,7 +41,6 @@ export default class Git extends Query {
         let cmd7 = this.convertCommand(
           `git rev-parse refs/remotes/origin/origin/${branch}^{commit}`
         );
-        // let cmd8 = this.convertCommand(`git config core.sparsecheckout`);
 
         this.moveDir(domain);
 
@@ -66,13 +65,10 @@ export default class Git extends Query {
         let code = await spawn(cmd6["cmd"], cmd6["options"], {
           capture: ["stdout", "stderr"]
         });
+        
         code.stdout = code.stdout.replace("\n", "");
         let cmd9 = this.convertCommand(`git checkout -f ${code.stdout}`);
-        // let a = await spawn(cmd8["cmd"], cmd8["options"], {
-        //   capture: ["stdout", "stderr"]
-        // });
-        // console.log(a.stderr);
-        // await spawn(cmd8["cmd"], cmd8["options"]);
+
         await spawn(cmd9["cmd"], cmd9["options"], {
           capture: ["stdout", "stderr"]
         });

@@ -30,10 +30,10 @@ export default class NodejsQuery extends Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -69,10 +69,10 @@ export default class NodejsQuery extends Query {
         });
         resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -104,10 +104,10 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -139,10 +139,10 @@ export default class NodejsQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -170,10 +170,30 @@ export default class NodejsQuery extends Query {
         // });
         resolve(env);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
+          e.message = e.stderr;
+        }
+        reject(e);
+      }
+    });
+  }
+
+  resetEnv(website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let cmd = this.convertCommand(`forever restart ${website}`);
+        await spawn(cmd["cmd"], cmd["options"], {
+          capture: ["stdout", "stderr"]
+        });
+        resolve(true);
+      } catch (e) {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
+          e.message = e.stdout;
+        }
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);

@@ -4,15 +4,48 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(create));
-router.put("/", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(edit));
+router.all("*", AuthMiddleware);
+router.post(
+  "/",
+  hasPermission.bind(Permission.USER_CREATE),
+  asyncMiddleware(create)
+);
+router.put(
+  "/",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(edit)
+);
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.put("/add_new", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(add));
+router.get(
+  "/reset",
+  hasPermission.bind(Permission.USER_VIEW),
+  asyncMiddleware(resetEnv)
+);
+router.put(
+  "/add_new",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(add)
+);
+
+async function resetEnv(req, res) {
+  try {
+    const website = req.query.website;
+    const query = new NodejsQuery();
+    query.moveDir(website);
+    const result = await query.resetEnv(website);
+    res.json({ data: { success: result } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function add(req, res) {
   try {
@@ -39,7 +72,7 @@ async function get(req, res) {
     }
     let query = new NodejsQuery();
     query.moveDir(website);
-    let result = await query.readEnv('.env');
+    let result = await query.readEnv(".env");
     res.json({ data: result });
   } catch (e) {
     if (e.message === "ENOENT: no such file or directory, uv_chdir") {

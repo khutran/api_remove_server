@@ -39,7 +39,7 @@ async function importDb(req, res) {
 
     let query = new LaravelQuery();
     query.moveDir(website);
-    await query.runMigrate();
+    await query.resetMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

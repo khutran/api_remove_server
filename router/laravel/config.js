@@ -4,15 +4,50 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(create));
-router.put("/", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(edit));
+router.all("*", AuthMiddleware);
+router.post(
+  "/",
+  hasPermission.bind(Permission.USER_CREATE),
+  asyncMiddleware(create)
+);
+router.put(
+  "/",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(edit)
+);
+
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.put("/add_new", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(add));
+
+router.get(
+  "/reset",
+  hasPermission.bind(Permission.USER_VIEW),
+  asyncMiddleware(reset)
+);
+router.put(
+  "/add_new",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(add)
+);
+
+async function reset(req, res) {
+  try {
+    const website = req.query.website;
+    let query = new LaravelQuery();
+    query.moveDir(website);
+    const result = await query.resetEnv();
+    res.json({ data: { success: result } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 
 async function get(req, res) {
   try {

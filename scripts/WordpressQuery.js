@@ -3,9 +3,9 @@ import { Query } from "./Query";
 import * as _ from "lodash";
 import fs from "fs";
 import models from "../models";
-var exec = require("child-process-promise").exec;
-import { Exception } from "../app/Exceptions/Exception";
 const spawncmd = require("child_process").spawn;
+const util = require("util");
+const mkdirp = util.promisify(require("mkdirp"));
 
 export default class WordpressQuery extends Query {
   addHtaccess() {
@@ -13,17 +13,17 @@ export default class WordpressQuery extends Query {
       try {
         if (fs.existsSync(".htaccess")) {
           resolve({ success: true });
+        } else {
+          let content =
+            "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteBase /\nRewriteRule ^index.php$ - [L]\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule . /index.php [L]\n</IfModule>";
+          fs.writeFileSync(".htaccess", content, "utf8");
+          resolve({ success: true });
         }
-
-        let content =
-          "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteBase /\nRewriteRule ^index.php$ - [L]\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule . /index.php [L]\n</IfModule>";
-        fs.writeFileSync(".htaccess", content, "utf8");
-        resolve({ success: true });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -43,10 +43,10 @@ export default class WordpressQuery extends Query {
         let config = await this.readConfig("wp-config.php");
         resolve(config);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -63,10 +63,10 @@ export default class WordpressQuery extends Query {
         });
         resolve({ stdout: sp.stdout, stderr: sp.stderr });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -97,15 +97,13 @@ export default class WordpressQuery extends Query {
         });
         this.moveDir(website);
         let file = await this.readConfig("wp-config.php");
-        // for (let i in file) {
-        //   file[i] = "";
-        // }
+
         resolve(file);
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -144,10 +142,10 @@ export default class WordpressQuery extends Query {
           resolve(true);
         });
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -161,7 +159,7 @@ export default class WordpressQuery extends Query {
         if (Boolean(process.env.MYSQL_ON) === true) {
           let config;
           if (fs.existsSync("database") === false) {
-            await spawn("mkdir", ["database"]);
+            await mkdirp("database", [0o755]);
           }
           if (fs.existsSync(".env")) {
             config = await this.readEnv(".env");
@@ -230,10 +228,10 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
@@ -344,10 +342,10 @@ export default class WordpressQuery extends Query {
           });
         }
       } catch (e) {
-        if (e.stdout !== "") {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
           e.message = e.stdout;
         }
-        if (e.stderr !== "") {
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
           e.message = e.stderr;
         }
         reject(e);
