@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "MULTI_THREAD=true ENV=production node ./dist/app.js",
-    "devstart": "nodemon ./node_modules/.bin/babel-node app.js",
+    "devstart": "PORT=3030 ./node_modules/.bin/nodemon ./node_modules/.bin/babel-node app.js",
+    "dockerstart": "PORT=5501 nodemon ./node_modules/.bin/babel-node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,error_code.md,README.md,app.test.js --copy-files"
   },
@@ -18,9 +19,6 @@
     "archiver": "^2.1.1",
     "async": "^2.6.1",
     "axios": "^0.18.0",
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
     "child-process-promise": "^2.2.1",
     "commander": "^2.11.0",
     "cors": "^2.8.4",
@@ -39,8 +37,11 @@
     "userid": "^0.3.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
-    "nodemon": "^1.17.2"
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "nodemon": "^1.18.3"
   }
 }

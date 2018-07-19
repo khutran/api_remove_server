@@ -12,3 +12,4 @@ app.test.js
 /dist
 /uploads
 yarn.lock
+/.docker/viwebsite_remote_server

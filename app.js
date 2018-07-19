@@ -1,11 +1,11 @@
-import express from 'express';
-import { ExceptionHandler } from './app/Exceptions/exceptionHandler';
-import { Exception } from './app/Exceptions/Exception';
+import express from "express";
+import { ExceptionHandler } from "./app/Exceptions/exceptionHandler";
+import { Exception } from "./app/Exceptions/Exception";
 import Router from "./router";
-var cors = require('cors');
-var server = require('http').Server(app);
+var cors = require("cors");
+var server = require("http").Server(app);
 
-require('dotenv').config();
+require("dotenv").config();
 
 var app = express();
 
@@ -21,14 +21,14 @@ var app = express();
 //    next();
 // });
 
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/", Router);
 app.use(ExceptionHandler);
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  var err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
@@ -36,12 +36,11 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.error = req.app.get("env") === "development" ? err : {};
   // render the error page
   res.status(err.status || 500);
   // res.render("error");
   throw new Exception(err.message, 404);
 });
 
-
-app.listen(3030);
+app.listen(process.env.PORT || 3030);
