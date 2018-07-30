@@ -5,13 +5,16 @@ import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
-import fs from "fs";
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(runComposer));
+router.all("*", AuthMiddleware);
+router.post(
+  "/",
+  hasPermission.bind(Permission.USER_CREATE),
+  asyncMiddleware(runComposer)
+);
 
 async function runComposer(req, res) {
   try {
@@ -29,7 +32,7 @@ async function runComposer(req, res) {
         path = item.slice(1, -13);
       }
     });
-
+    // path = "/wp-content/themes/netfood";
     if (!_.isNil(path)) {
       query.moveDir(website, path);
 

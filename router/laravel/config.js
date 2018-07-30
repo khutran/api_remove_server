@@ -111,7 +111,7 @@ async function edit(req, res) {
     let query = new LaravelQuery();
     query.moveDir(website);
     let result = await query.editEnv(config);
-    res.json({ data: result });
+    res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);

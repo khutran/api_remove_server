@@ -5,15 +5,27 @@ import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(create));
-router.put("/", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(edit));
+router.all("*", AuthMiddleware);
+router.post(
+  "/",
+  hasPermission.bind(Permission.USER_CREATE),
+  asyncMiddleware(create)
+);
+router.put(
+  "/",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(edit)
+);
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.put("/add_new", hasPermission.bind(Permission.USER_UPDATE), asyncMiddleware(add));
+router.put(
+  "/add_new",
+  hasPermission.bind(Permission.USER_UPDATE),
+  asyncMiddleware(add)
+);
 router.get(
   "/reset",
   hasPermission.bind(Permission.USER_VIEW),
@@ -98,7 +110,7 @@ async function edit(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let result = await query.editWpConfig(config);
-    res.json({ data: result });
+    res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);

@@ -15,7 +15,7 @@ router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddlew
 router.post("/reset", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(reset));
 router.post("/seed", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(seed));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
-router.post("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
+router.put("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
 router.post("/replace", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(replace));
 
 async function replace(req, res) {
@@ -40,6 +40,7 @@ async function importDb(req, res) {
     let query = new LaravelQuery();
     query.moveDir(website);
     await query.resetMigrate();
+    await query.seedMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {

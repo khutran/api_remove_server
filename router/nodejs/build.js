@@ -13,7 +13,7 @@ let router = express.Router();
 
 router.all('*', AuthMiddleware);
 router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.post("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
+router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
 router.get("/download", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(download));
@@ -92,7 +92,7 @@ async function clone(req, res) {
     await query.creatFolder(domain);
     query.moveDir(domain);
     let result = await query.clone(domain, git, branch, key, secret);
-    res.json({ data: "result" });
+    res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);

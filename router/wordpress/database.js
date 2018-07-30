@@ -13,7 +13,7 @@ router.all('*', AuthMiddleware);
 router.post("/build", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(build));
 router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(create));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
-router.post("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
+router.put("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
 router.post("/replace", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(replace));
 
 async function replace(req, res) {
@@ -65,7 +65,6 @@ async function importDb(req, res) {
 async function create(req, res) {
   try {
     let website = req.body.website;
-    let dataconfig = req.body.dataconfig;
     if (!website) {
       throw new Error("website not empty");
     }

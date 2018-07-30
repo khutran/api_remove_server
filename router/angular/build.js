@@ -13,7 +13,7 @@ let router = express.Router();
 
 router.all('*', AuthMiddleware);
 router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.post("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
+router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
 router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));

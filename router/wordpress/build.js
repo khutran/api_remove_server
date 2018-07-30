@@ -15,7 +15,7 @@ let router = express.Router();
 
 router.all('*', AuthMiddleware);
 router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.post("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
+router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
 router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
 router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));
@@ -47,6 +47,7 @@ async function buildFirts(req, res) {
     );
     
     await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+
     res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
@@ -75,10 +76,12 @@ async function clone(req, res) {
     let branch = req.body.branch;
     let key = req.body.key;
     let secret = req.body.secret;
+
     let query = new Git();
     await query.creatFolder(domain);
     query.moveDir(domain);
     let result = await query.clone(domain, git, branch, key, secret);
+
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
