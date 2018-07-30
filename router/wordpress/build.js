@@ -5,20 +5,34 @@ import { Exception } from "../../app/Exceptions/Exception";
 import Error from "../../app/Exceptions/GetError";
 import * as _ from "lodash";
 import Git from "../../scripts/Git";
-import AuthMiddleware from '../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-
-
-router.all('*', AuthMiddleware);
-router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
-router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
+router.all("*", AuthMiddleware);
+router.post(
+  "/clone",
+  hasPermission.bind(Permission.ADMIN_CREATE),
+  asyncMiddleware(clone)
+);
+router.put(
+  "/pull",
+  hasPermission.bind(Permission.USER_CREATE),
+  asyncMiddleware(pull)
+);
+router.delete(
+  "/",
+  hasPermission.bind(Permission.ADMIN_DELETE),
+  asyncMiddleware(deleteP)
+);
 router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));
+router.post(
+  "/buildfirts",
+  hasPermission.bind(Permission.ADMIN_CREATE),
+  asyncMiddleware(buildFirts)
+);
 // router.post("/backup", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(backup));
 
 async function buildFirts(req, res) {
@@ -29,7 +43,7 @@ async function buildFirts(req, res) {
     }
 
     let query = new WordpressQuery();
-    
+
     query.moveDir(website);
     await query.addHtaccess();
     let config = await query.readConfig("wp-config.php");
@@ -45,8 +59,12 @@ async function buildFirts(req, res) {
       config["DB_HOST"],
       file[file.length - 1].slice(11)
     );
-    
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      website
+    );
 
     res.json({ data: { suscess: true } });
   } catch (e) {
@@ -63,9 +81,9 @@ async function get(req, res) {
     let website = req.query.website;
     let query = new WordpressQuery();
     query.moveDir(website);
-    res.json({ success: true });
+    res.json({ data: { success: true } });
   } catch (e) {
-    throw new Exception('website not found', 500);
+    throw new Exception("website not found", 500);
   }
 }
 
@@ -125,7 +143,11 @@ async function pull(req, res) {
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
     await queryW.addHtaccess();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      domain
+    );
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

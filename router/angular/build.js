@@ -69,7 +69,7 @@ async function get(req, res) {
     let website = req.query.website;
     let query = new AngularQuery();
     query.moveDir(website);
-    res.json({ success: true });
+    res.json({ data: { success: true } });
   } catch (e) {
     throw new Exception("website not found", 500);
   }
