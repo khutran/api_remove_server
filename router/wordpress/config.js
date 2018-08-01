@@ -10,25 +10,17 @@ import Permission from "../../app/Config/AvailablePermissions";
 let router = express.Router();
 
 router.all("*", AuthMiddleware);
-router.post(
-  "/",
-  hasPermission.bind(Permission.USER_CREATE),
-  asyncMiddleware(create)
-);
-router.put(
-  "/",
-  hasPermission.bind(Permission.USER_UPDATE),
-  asyncMiddleware(edit)
-);
-router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
+router.post("/", asyncMiddleware(create));
+router.put("/", asyncMiddleware(edit));
+router.get("/", asyncMiddleware(get));
 router.put(
   "/add_new",
-  hasPermission.bind(Permission.USER_UPDATE),
+
   asyncMiddleware(add)
 );
 router.get(
   "/reset",
-  hasPermission.bind(Permission.USER_VIEW),
+
   asyncMiddleware(resetEnv)
 );
 

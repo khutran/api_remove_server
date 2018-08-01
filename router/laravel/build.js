@@ -5,18 +5,18 @@ import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
 import Error from "../../app/Exceptions/GetError";
 import * as _ from "lodash";
-import AuthMiddleware from '../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
-router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
-router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));
+router.all("*", AuthMiddleware);
+router.post("/clone", asyncMiddleware(clone));
+router.put("/pull", asyncMiddleware(pull));
+router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+router.post("/buildfirts", asyncMiddleware(buildFirts));
 
 async function buildFirts(req, res) {
   try {
@@ -30,7 +30,11 @@ async function buildFirts(req, res) {
     await query.createKey();
     await query.runMigrate();
     await query.seedMigrate();
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      website
+    );
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -48,7 +52,7 @@ async function get(req, res) {
     query.moveDir(website);
     res.json({ data: { success: true } });
   } catch (e) {
-    throw new Exception('website not found', 500);
+    throw new Exception("website not found", 500);
   }
 }
 
@@ -63,7 +67,7 @@ async function clone(req, res) {
     await query.creatFolder(domain);
     query.moveDir(domain);
     let result = await query.clone(domain, git, branch, key, secret);
-    res.json({ data: "result" });
+    res.json({ data: result });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -84,7 +88,11 @@ async function pull(req, res) {
     let query = new Git();
     query.moveDir(domain);
     let result = await query.pull(domain, git, branch, key, secret);
-    await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, domain);
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      domain
+    );
     res.json({ data: result });
   } catch (e) {
     if (e.error_code) {

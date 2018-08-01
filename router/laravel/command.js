@@ -2,14 +2,14 @@ import express from "express";
 import LaravelQuery from "../../scripts/LaravelQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
-import AuthMiddleware from '../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE),  asyncMiddleware(runCommand));
+router.all("*", AuthMiddleware);
+router.post("/", asyncMiddleware(runCommand));
 
 async function runCommand(req, res) {
   try {

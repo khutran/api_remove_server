@@ -11,17 +11,12 @@ let router = express.Router();
 
 router.get("/database", asyncMiddleware(downloadDb));
 router.get("/source", asyncMiddleware(downloadSource));
-router.get(
-  "/gettoken",
-  AuthMiddleware,
-  hasPermission.bind(Permission.USER_VIEW),
-  asyncMiddleware(gettoken)
-);
+router.get("/gettoken", AuthMiddleware, asyncMiddleware(gettoken));
 
 async function gettoken(req, res) {
   let token = jwt.sign(
     {
-      data: 'xxxxxx'
+      data: "xxxxxx"
     },
     process.env.JWT_SECRET,
     { expiresIn: 100 }
@@ -33,12 +28,12 @@ async function downloadDb(req, res) {
   try {
     let website = req.query.website;
     let token = req.query.token;
-    if(!token) {
-      throw new Error('token not found', 304);
+    if (!token) {
+      throw new Error("token not found", 304);
     }
     let decoded = await jwt.verify(token, process.env.JWT_SECRET);
-    if(decoded.data !== 'xxxxxx') {
-      throw new Error('token illegal', 304)
+    if (decoded.data !== "xxxxxx") {
+      throw new Error("token illegal", 304);
     }
     let query = new NodejsQuery();
     query.moveDir(website);
@@ -55,12 +50,12 @@ async function downloadDb(req, res) {
 async function downloadSource(req, res) {
   let website = req.query.website;
   let token = req.query.token;
-  if(!token) {
-    throw new Error('token not found', 304);
+  if (!token) {
+    throw new Error("token not found", 304);
   }
   let decoded = await jwt.verify(token, process.env.JWT_SECRET);
-  if(decoded.data !== 'xxxxxx') {
-    throw new Error('token illegal', 304)
+  if (decoded.data !== "xxxxxx") {
+    throw new Error("token illegal", 304);
   }
   let query = new NodejsQuery();
   await query.compressed(website, res);

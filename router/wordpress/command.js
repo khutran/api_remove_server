@@ -9,7 +9,7 @@ import Permission from '../../app/Config/AvailablePermissions';
 let router = express.Router();
 
 router.all('*', AuthMiddleware);
-router.post("/", hasPermission.bind(Permission.USER_CREATE),  asyncMiddleware(runCommand));
+router.post("/", asyncMiddleware(runCommand));
 
 async function runCommand(req, res) {
   try {

@@ -12,28 +12,12 @@ import Permission from "../../app/Config/AvailablePermissions";
 let router = express.Router();
 
 router.all("*", AuthMiddleware);
-router.post(
-  "/clone",
-  hasPermission.bind(Permission.ADMIN_CREATE),
-  asyncMiddleware(clone)
-);
-router.put(
-  "/pull",
-  hasPermission.bind(Permission.USER_CREATE),
-  asyncMiddleware(pull)
-);
-router.delete(
-  "/",
-  hasPermission.bind(Permission.ADMIN_DELETE),
-  asyncMiddleware(deleteP)
-);
-router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.post(
-  "/buildfirts",
-  hasPermission.bind(Permission.ADMIN_CREATE),
-  asyncMiddleware(buildFirts)
-);
-// router.post("/backup", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(backup));
+router.post("/clone", asyncMiddleware(clone));
+router.put("/pull", asyncMiddleware(pull));
+router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+router.post("/buildfirts", asyncMiddleware(buildFirts));
+// router.post("/backup", asyncMiddleware(backup));
 
 async function buildFirts(req, res) {
   try {

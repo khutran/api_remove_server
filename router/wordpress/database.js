@@ -5,16 +5,16 @@ import { Exception } from "../../app/Exceptions/Exception";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/build", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(build));
-router.post("/create", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(create));
-router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteDb));
-router.put("/import", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(importDb));
-router.post("/replace", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(replace));
+router.all("*", AuthMiddleware);
+router.post("/build", asyncMiddleware(build));
+router.post("/create", asyncMiddleware(create));
+router.delete("/", asyncMiddleware(deleteDb));
+router.put("/import", asyncMiddleware(importDb));
+router.post("/replace", asyncMiddleware(replace));
 
 async function replace(req, res) {
   try {
@@ -24,16 +24,10 @@ async function replace(req, res) {
     query.moveDir(website);
     let db = await query.readConfig("wp-config.php");
     let urlold = await query.getSiteurl(db["DB_NAME"], db["PREFIX"]);
-    if (urlold.indexOf("https") >-1) {
+    if (urlold.indexOf("https") > -1) {
       https = true;
     }
-    await query.replaceUrl(
-      db["DB_NAME"],
-      db["PREFIX"],
-      urlold,
-      website,
-      https
-    );
+    await query.replaceUrl(db["DB_NAME"], db["PREFIX"], urlold, website, https);
     res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
@@ -52,7 +46,7 @@ async function importDb(req, res) {
     query.moveDir(website);
     let q = await query.importNewDb(website);
 
-    res.json({ data: {suscess : true } });
+    res.json({ data: { suscess: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);

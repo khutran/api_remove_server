@@ -7,18 +7,18 @@ import Error from "../../app/Exceptions/GetError";
 import * as _ from "lodash";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
-router.post("/clone", hasPermission.bind(Permission.ADMIN_CREATE) , asyncMiddleware(clone));
-router.put("/pull", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(pull));
-router.delete("/", hasPermission.bind(Permission.ADMIN_DELETE), asyncMiddleware(deleteP));
-router.get("/", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(get));
-router.get("/download", hasPermission.bind(Permission.USER_VIEW), asyncMiddleware(download));
-router.post("/buildfirts", hasPermission.bind(Permission.ADMIN_CREATE), asyncMiddleware(buildFirts));
-router.post("/runbuild", hasPermission.bind(Permission.USER_CREATE), asyncMiddleware(runBuild));
+router.all("*", AuthMiddleware);
+router.post("/clone", asyncMiddleware(clone));
+router.put("/pull", asyncMiddleware(pull));
+router.delete("/", asyncMiddleware(deleteP));
+router.get("/", asyncMiddleware(get));
+router.get("/download", asyncMiddleware(download));
+router.post("/buildfirts", asyncMiddleware(buildFirts));
+router.post("/runbuild", asyncMiddleware(runBuild));
 
 async function runBuild(req, res) {
   try {
