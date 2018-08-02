@@ -8,7 +8,7 @@ import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all("*", AuthMiddleware);
+// router.all("*", AuthMiddleware);
 router.post("/", asyncMiddleware(create));
 router.put("/", asyncMiddleware(edit));
 router.get("/", asyncMiddleware(get));

@@ -120,8 +120,21 @@ export default class WordpressQuery extends Query {
             error_code: 204
           });
         }
+        for (let i in data) {
+          if (i === "PREFIX") {
+            data["$table_prefix"] = data[i];
+            delete data[i];
+          }
+        }
+
         let filewpconfig = await this.readFile("wp-config.php");
         let file = await this.readConfig("wp-config.php");
+        for (let i in file) {
+          if (i === "PREFIX") {
+            file["$table_prefix"] = file[i];
+            delete file[i];
+          }
+        }
         filewpconfig = _.split(filewpconfig, "\n");
         for (let key in data) {
           for (let i = 0; i < filewpconfig.length; i++) {
@@ -130,11 +143,11 @@ export default class WordpressQuery extends Query {
             }
           }
         }
+
         let string = new String();
         for (let i = 0; i < filewpconfig.length; i++) {
           string = `${string}${filewpconfig[i]}\n`;
         }
-
         fs.writeFile("wp-config.php", string, err => {
           if (err) {
             throw new Error(err);

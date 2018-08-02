@@ -245,22 +245,29 @@ export class Query {
           });
           for (let i in data) {
             if (data[i].indexOf("$table_prefix") > -1) {
-              data[i] = data[i].replace(/ /gi, "");
               data[i] = data[i].replace(/'/gi, "");
               data[i] = data[i].slice(1, -1);
               data[i] = _.split(data[i], "=");
+              data[i][1] = _.trim(data[i][1]);
               obj["PREFIX"] = data[i][1];
             } else {
               if (data[i].indexOf("//") > -1) {
                 data[i] = data[i].slice(0, data[i].indexOf("//"));
               }
-              data[i] = data[i].replace(/ /gi, "");
+
               data[i] = data[i].replace(/'/gi, "");
               data[i] = data[i].slice(7, -2);
               data[i] = _.split(data[i], ",");
+              data[i][1] = _.trim(data[i][1]);
               obj[data[i][0]] = data[i][1];
             }
           }
+          _.mapKeys(obj, (value, key) => {
+            if (key.indexOf("DISALLOW_FILE_MODS") > -1) {
+              obj["DISALLOW_FILE_MODS"] = value;
+              delete obj[key];
+            }
+          });
           resolve(obj);
         });
       } catch (e) {
@@ -640,7 +647,10 @@ export class Query {
         if (fs.existsSync(`${process.env.PATH_WEB}/${name}/workspace`)) {
           throw new Error("website exits", 208);
         } else {
-          const result = await mkdirp(`${process.env.PATH_WEB}/${name}/workspace`, [0o755]);
+          const result = await mkdirp(
+            `${process.env.PATH_WEB}/${name}/workspace`,
+            [0o755]
+          );
           resolve({
             path: `${result}/workspace`,
             success: true

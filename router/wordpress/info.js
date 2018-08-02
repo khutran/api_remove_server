@@ -9,7 +9,7 @@ import Permission from '../../app/Config/AvailablePermissions';
 
 let router = express.Router();
 
-router.all('*', AuthMiddleware);
+// router.all('*', AuthMiddleware);
 router.get("/", asyncMiddleware(inFo));
 
 async function inFo(req, res) {

@@ -11,7 +11,7 @@ import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
-router.all("*", AuthMiddleware);
+// router.all("*", AuthMiddleware);
 router.post("/clone", asyncMiddleware(clone));
 router.put("/pull", asyncMiddleware(pull));
 router.delete("/", asyncMiddleware(deleteP));

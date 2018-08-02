@@ -10,7 +10,7 @@ const fs = require("fs");
 
 let router = express.Router();
 
-router.all("*", AuthMiddleware);
+// router.all("*", AuthMiddleware);
 router.get("/info", asyncMiddleware(info));
 router.get("/", asyncMiddleware(getAll));
 router.get("/:uid", asyncMiddleware(getByUid));
