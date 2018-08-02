@@ -33,9 +33,12 @@ async function buildFirts(req, res) {
     let config = await query.readConfig("wp-config.php");
     let file = await query.findFile("*.sql");
     file = _.remove(file, function(n) {
-      return n.indexOf("database");
+      return n.indexOf("database") > -1;
     });
 
+    if (_.isEmpty(file)) {
+      throw new Error("project not file sql", 1000);
+    }
     await query.importDatabase(
       config["DB_USER"],
       config["DB_PASSWORD"],

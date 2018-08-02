@@ -321,7 +321,7 @@ export default class WordpressQuery extends Query {
 
           let file = await this.findFile("*.sql");
           file = _.remove(file, function(n) {
-            return n.indexOf("database") && !n.indexOf('plugins');
+            return n.indexOf("database") > -1;
           });
 
           await this.importDatabase(
