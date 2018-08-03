@@ -16,6 +16,17 @@ var archive = archiver("zip", {
 });
 
 export class Query {
+  checkAlready(website = null) {
+    return new Promise((resolve, reject) => {
+      path = `${process.env.PATH_WEB}/${website}/workspace`;
+      if (fs.existsSync(path) === false) {
+        resolve({ success: false });
+      } else {
+        resolve({ success: true });
+      }
+    });
+  }
+
   info() {
     return new Promise(async (resolve, reject) => {
       try {

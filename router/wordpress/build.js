@@ -67,10 +67,14 @@ async function get(req, res) {
   try {
     let website = req.query.website;
     let query = new WordpressQuery();
-    query.moveDir(website);
-    res.json({ data: { success: true } });
+    const result = await query.checkAlready(website);
+    res.json({ data: result });
   } catch (e) {
-    res.json({ data: { success: false } });
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
   }
 }
 
