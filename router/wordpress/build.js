@@ -70,11 +70,7 @@ async function get(req, res) {
     const result = await query.checkAlready(website);
     res.json({ data: result });
   } catch (e) {
-    if (e.error_code) {
-      throw new Exception(e.message, e.error_code);
-    } else {
-      throw new Exception(e.message, 500);
-    }
+    res.json({ data: result });
   }
 }
 
