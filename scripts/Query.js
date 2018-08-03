@@ -196,10 +196,7 @@ export class Query {
       let obj = {};
 
       if (fs.existsSync(path) === false) {
-        reject({
-          message: `${path} not found`,
-          error_code: 204
-        });
+        resolve({});
       }
 
       fs.readFile(path, (err, data) => {

@@ -35,10 +35,7 @@ export default class WordpressQuery extends Query {
     return new Promise(async (resolve, reject) => {
       try {
         if (fs.existsSync("wp-config.php") === false) {
-          reject({
-            message: `wp-config.php not found`,
-            error_code: 204
-          });
+          resolve({});
         }
         let config = await this.readConfig("wp-config.php");
         resolve(config);
