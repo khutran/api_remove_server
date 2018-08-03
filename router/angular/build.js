@@ -75,7 +75,7 @@ async function get(req, res) {
     query.moveDir(website);
     res.json({ data: { success: true } });
   } catch (e) {
-    throw new Exception("website not found", 500);
+    res.json({ data: { success: false } });
   }
 }
 
