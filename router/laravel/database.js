@@ -79,7 +79,7 @@ async function create(req, res) {
     }
 
     let query = new LaravelQuery();
-    query.moveDir(website);
+    // query.moveDir(website);
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
     result["Password"] = result["authentication_string"];

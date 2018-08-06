@@ -63,7 +63,7 @@ async function create(req, res) {
       throw new Error("website not empty");
     }
     let query = new WordpressQuery();
-    query.moveDir(website);
+    // query.moveDir(website);
     let result = await query.createUserDb(website);
     result["Dbname"] = `${result["User"]}_db`;
     result["Password"] = result["authentication_string"];
