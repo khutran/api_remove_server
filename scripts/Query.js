@@ -133,7 +133,7 @@ export class Query {
         if (process.env.PATH_WEB) {
           const uid = userid.uid(user);
           const gid = userid.gid(group);
-          fs.chmodr(
+          fs.chownr(
             `${process.env.PATH_WEB}/${website}/workspace`,
             uid,
             gid,
