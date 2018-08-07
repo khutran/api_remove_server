@@ -20,6 +20,7 @@
     "async": "^2.6.1",
     "axios": "^0.18.0",
     "child-process-promise": "^2.2.1",
+    "chownr": "^1.0.1",
     "commander": "^2.11.0",
     "cors": "^2.8.4",
     "dotenv": "^5.0.1",

@@ -10,6 +10,7 @@ import archiver from "archiver";
 import userid from "userid";
 const util = require("util");
 const mkdirp = util.promisify(require("mkdirp"));
+import chownr from "chownr";
 
 var archive = archiver("zip", {
   zlib: { level: 9 } // Sets the compression level.
@@ -133,7 +134,7 @@ export class Query {
         if (process.env.PATH_WEB) {
           const uid = userid.uid(user);
           const gid = userid.gid(group);
-          fs.chownr(
+          chownr(
             `${process.env.PATH_WEB}/${website}/workspace`,
             uid,
             gid,
