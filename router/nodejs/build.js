@@ -29,7 +29,11 @@ async function runBuild(req, res) {
     let query = new NodejsQuery();
     query.moveDir(website);
     await query.runBuild();
-    // await query.chown(process.env.USER_PERMISSION, process.env.GROUP_PERMISSON, website);
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      website
+    );
     await query.restartForever(website);
     res.json({ data: { success: true } });
   } catch (e) {
