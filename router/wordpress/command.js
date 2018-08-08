@@ -2,9 +2,11 @@ import express from "express";
 import WordpressQuery from "../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
-import AuthMiddleware from "../../midlewares/AuthMiddleware";
-import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from "../../app/Config/AvailablePermissions";
+import * as _ from "lodash";
+// import AuthMiddleware from "../../midlewares/AuthMiddleware";
+// import hasPermission from "../../midlewares/PermissionMiddleware";
+// import Permission from "../../app/Config/AvailablePermissions";
+// import { load } from 'dotenv';
 
 let router = express.Router();
 
