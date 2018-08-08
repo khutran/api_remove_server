@@ -2,9 +2,9 @@ import express from "express";
 import WordpressQuery from "../../scripts/WordpressQuery";
 import { asyncMiddleware } from "../../midlewares/AsyncMiddleware";
 import { Exception } from "../../app/Exceptions/Exception";
-import AuthMiddleware from '../../midlewares/AuthMiddleware';
+import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
-import Permission from '../../app/Config/AvailablePermissions';
+import Permission from "../../app/Config/AvailablePermissions";
 
 let router = express.Router();
 
@@ -22,7 +22,11 @@ async function runCommand(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let result = await query.runCommand(command);
-    res.json({ data: result });
+    if (_.isEmpty(result.stdout)) {
+      res.json({ data: result.stdout });
+    } else {
+      res.json({ data: result.stderr });
+    }
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
