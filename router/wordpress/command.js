@@ -24,7 +24,7 @@ async function runCommand(req, res) {
     let query = new WordpressQuery();
     query.moveDir(website);
     let result = await query.runCommand(command);
-    if (_.isEmpty(result.stdout)) {
+    if (!_.isEmpty(result.stdout)) {
       res.json({ data: result.stdout });
     } else {
       res.json({ data: result.stderr });
