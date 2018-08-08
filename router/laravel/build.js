@@ -17,7 +17,29 @@ router.put("/pull", asyncMiddleware(pull));
 router.delete("/", asyncMiddleware(deleteP));
 router.get("/", asyncMiddleware(get));
 router.post("/buildfirts", asyncMiddleware(buildFirts));
+router.post("/runbuild", asyncMiddleware(runBuild));
 
+async function runBuild(req, res) {
+  try {
+    let website = req.body.website;
+    if (!website) {
+      throw new Error("website not empty");
+    }
+    const query = new LaravelQuery();
+    await query.chown(
+      process.env.USER_PERMISSION,
+      process.env.GROUP_PERMISSON,
+      website
+    );
+    res.json({ data: { success: true } });
+  } catch (e) {
+    if (e.error_code) {
+      throw new Exception(e.message, e.error_code);
+    } else {
+      throw new Exception(e.message, 500);
+    }
+  }
+}
 async function buildFirts(req, res) {
   try {
     let website = req.body.website;
