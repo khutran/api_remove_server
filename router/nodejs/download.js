@@ -27,14 +27,14 @@ async function gettoken(req, res) {
 async function downloadDb(req, res) {
   try {
     let website = req.query.website;
-    let token = req.query.token;
-    if (!token) {
-      throw new Error("token not found", 304);
-    }
-    let decoded = await jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.data !== "xxxxxx") {
-      throw new Error("token illegal", 304);
-    }
+    // let token = req.query.token;
+    // if (!token) {
+    //   throw new Error("token not found", 304);
+    // }
+    // let decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    // if (decoded.data !== "xxxxxx") {
+    //   throw new Error("token illegal", 304);
+    // }
     let query = new NodejsQuery();
     query.moveDir(website);
     await query.dump(res);
@@ -49,14 +49,14 @@ async function downloadDb(req, res) {
 
 async function downloadSource(req, res) {
   let website = req.query.website;
-  let token = req.query.token;
-  if (!token) {
-    throw new Error("token not found", 304);
-  }
-  let decoded = await jwt.verify(token, process.env.JWT_SECRET);
-  if (decoded.data !== "xxxxxx") {
-    throw new Error("token illegal", 304);
-  }
+  // let token = req.query.token;
+  // if (!token) {
+  //   throw new Error("token not found", 304);
+  // }
+  // let decoded = await jwt.verify(token, process.env.JWT_SECRET);
+  // if (decoded.data !== "xxxxxx") {
+  //   throw new Error("token illegal", 304);
+  // }
   let query = new NodejsQuery();
   await query.compressed(website, res);
 }
