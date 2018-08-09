@@ -531,7 +531,6 @@ export class Query {
   deleteDatabase(user, db) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(user, db);
         if (Boolean(process.env.MYSQL_ON) === true) {
           await models.sequelize.query(`DROP DATABASE ${db}`);
           await models.sequelize.query(`DROP USER ${user}`);
