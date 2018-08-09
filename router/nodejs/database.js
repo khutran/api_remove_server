@@ -71,7 +71,6 @@ async function deleteDb(req, res) {
     let query = new NodejsQuery();
     query.moveDir(website);
     let config = await query.readEnv(".env");
-    console.log(config['DB_USER']);
     let q = await query.deleteDatabase(config["DB_USER"], config["DB_NAME"]);
 
     res.json({ data: q });
