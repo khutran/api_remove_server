@@ -72,9 +72,9 @@ async function deleteDb(req, res) {
     query.moveDir(website);
     let config = await query.readEnv(".env");
     console.log(config['DB_USER']);
-    // let q = await query.deleteDatabase(config["DB_USER"], config["DB_NAME"]);
+    let q = await query.deleteDatabase(config["DB_USER"], config["DB_NAME"]);
 
-    res.json({ data: 'q' });
+    res.json({ data: q });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
