@@ -22,7 +22,11 @@ async function runCommand(req, res) {
     let query = new AngularQuery();
     query.moveDir(website);
     let result = await query.runCommand(command);
-    res.json({ data: result });
+    if (!_.isEmpty(result.stdout)) {
+      res.json({ data: result.stdout });
+    } else {
+      res.json({ data: result.stderr });
+    }
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
