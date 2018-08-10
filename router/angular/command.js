@@ -5,6 +5,7 @@ import { Exception } from "../../app/Exceptions/Exception";
 import AuthMiddleware from "../../midlewares/AuthMiddleware";
 import hasPermission from "../../midlewares/PermissionMiddleware";
 import Permission from '../../app/Config/AvailablePermissions';
+import * as _ from "lodash";
 
 let router = express.Router();
 
