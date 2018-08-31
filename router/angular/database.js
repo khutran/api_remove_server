@@ -32,14 +32,6 @@ async function replace(req, res) {
 
 async function importDb(req, res) {
   try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("website not empty");
-    }
-
-    let query = new AngularQuery();
-    query.moveDir(website);
-    await query.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -52,7 +44,6 @@ async function importDb(req, res) {
 
 async function deleteDb(req, res) {
   try {
-    let website = req.query.website;
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -65,18 +56,7 @@ async function deleteDb(req, res) {
 
 async function create(req, res) {
   try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("website not empty");
-    }
-
-    let query = new AngularQuery();
-    query.moveDir(website);
-    let result = await query.createUserDb(website);
-    result["Dbname"] = `${result["User"]}_db`;
-    result["Password"] = result["authentication_string"];
-    result = _.pick(result, ["Host", "User", "Password", "Dbname"]);
-    res.json({ data: result });
+    res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
       throw new Exception(e.message, e.error_code);
@@ -88,13 +68,6 @@ async function create(req, res) {
 
 async function build(req, res) {
   try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("Website not empty");
-    }
-    let query = new AngularQuery();
-    query.moveDir(website);
-    await query.runMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -107,14 +80,6 @@ async function build(req, res) {
 
 async function reset(req, res) {
   try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("Website not empty");
-    }
-
-    let query = new AngularQuery();
-    query.moveDir(website);
-    await query.resetMigrate(website);
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
@@ -127,14 +92,6 @@ async function reset(req, res) {
 
 async function seed(req, res) {
   try {
-    let website = req.body.website;
-    if (!website) {
-      throw new Error("Website not empty");
-    }
-
-    let query = new AngularQuery();
-    query.moveDir(website);
-    await query.seedMigrate();
     res.json({ data: { success: true } });
   } catch (e) {
     if (e.error_code) {
