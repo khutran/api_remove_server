@@ -34,6 +34,8 @@ async function runBuild(req, res) {
       process.env.GROUP_PERMISSON,
       website
     );
+    await chmod("644", "f", website);
+    await chmod("755", "d", website);
     await query.restartForever(website);
     res.json({ data: { success: true } });
   } catch (e) {

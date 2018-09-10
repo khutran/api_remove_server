@@ -63,8 +63,7 @@ export class Query {
           childProcess.stdin.write(grep.stdout);
           childProcess.stdin.end();
         });
-        let r = _
-          .split(use_ram.stdout, "-")
+        let r = _.split(use_ram.stdout, "-")
           .filter(item => {
             return item !== "\n";
           })
@@ -125,6 +124,37 @@ export class Query {
       });
 
       resolve(string);
+    });
+  }
+
+  chmod(permission, type, website) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (process.env.PATH_WEB) {
+          if ((type = "d")) {
+            await exec(
+              `find ${
+                process.env.PATH_WEB
+              }/${website}/workspace -type d -exec chmod ${permission} {} +`
+            );
+          }
+          if ((type = "f")) {
+            await exec(
+              `find ${
+                process.env.PATH_WEB
+              }/${website}/workspace -type f -exec chmod ${permission} {} +`
+            );
+          }
+        }
+      } catch (e) {
+        if (e.stdout !== "" && !_.isNil(e.stdout)) {
+          e.message = e.stdout;
+        }
+        if (e.stderr !== "" && !_.isNil(e.stderr)) {
+          e.message = e.stderr;
+        }
+        reject(e);
+      }
     });
   }
 
